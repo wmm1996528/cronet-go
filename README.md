@@ -33,3 +33,12 @@ import (
 	"github.com/weblifeio/cronet-go"
 )
 ```
+
+When building your project set these environment variables:
+
+```sh
+export set CGO_CFLAGS="-I/usr/local/include/cronet"
+export set CGO_LDFLAGS="-Wl,-rpath,/usr/local/lib/cronet /usr/local/lib/cronet/libcronet.dylib"
+
+go build <your-project-here>
+```
