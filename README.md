@@ -25,3 +25,11 @@ cp out/Cronet/cronet/include/* /usr/local/include/cronet
 cp out/Cronet/*.dylib /usr/local/lib/cronet
 ln -s /usr/local/lib/cronet/libcronet.*.dylib /usr/local/lib/cronet/libcronet.dylib
 ```
+
+## Use cronet-go
+
+```
+import (
+	"github.com/weblifeio/cronet-go"
+)
+```

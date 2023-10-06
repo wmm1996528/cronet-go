@@ -1,3 +1,3 @@
-module github.com/sagernet/cronet-go
+module github.com/weblifeio/cronet-go
 
 go 1.18

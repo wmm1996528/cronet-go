@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/sagernet/cronet-go"
+	"github.com/weblifeio/cronet-go"
 )
 
 func main() {

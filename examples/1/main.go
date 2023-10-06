@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/sagernet/cronet-go"
+	"github.com/weblifeio/cronet-go"
 )
 
 func main() {
