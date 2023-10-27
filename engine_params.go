@@ -213,3 +213,16 @@ func (p EngineParams) SetExperimentalOptions(options string) {
 func (p EngineParams) ExperimentalOptions() string {
 	return C.GoString(C.Cronet_EngineParams_experimental_options_get(p.ptr))
 }
+
+// SetProxyServer sets a default value for the Proxy Server to be used for UrlRequests
+// created by this engine. Cronet will forward this requests to destination
+// using this proxy.
+func (p EngineParams) SetProxyServer(options string) {
+	cOptions := C.CString(options)
+	C.Cronet_EngineParams_proxy_server_set(p.ptr, cOptions)
+	C.free(unsafe.Pointer(cOptions))
+}
+
+func (p EngineParams) ProxyServer() string {
+	return C.GoString(C.Cronet_EngineParams_proxy_server_get(p.ptr))
+}
