@@ -21,6 +21,28 @@ type RoundTripper struct {
 	closeExecutor bool
 }
 
+func NewCronetRoundTripper() *RoundTripper {
+	t := &RoundTripper{}
+	engineParams := NewEngineParams()
+	engineParams.SetEnableHTTP2(true)
+	engineParams.SetEnableQuic(true)
+	engineParams.SetEnableBrotli(true)
+	t.Engine = NewEngine()
+	t.Engine.StartWithParams(engineParams)
+	engineParams.Destroy()
+	t.closeEngine = true
+
+	t.Executor = NewExecutor(func(executor Executor, command Runnable) {
+		go func() {
+			command.Run()
+			command.Destroy()
+		}()
+	})
+	t.closeExecutor = true
+	runtime.SetFinalizer(t, (*RoundTripper).close)
+	return t
+}
+
 func (t *RoundTripper) close() {
 	if t.closeEngine {
 		t.Engine.Shutdown()
@@ -32,31 +54,6 @@ func (t *RoundTripper) close() {
 }
 
 func (t *RoundTripper) RoundTrip(request *http.Request) (*http.Response, error) {
-	var emptyEngine Engine
-	if t.Engine == emptyEngine {
-		engineParams := NewEngineParams()
-		engineParams.SetEnableHTTP2(true)
-		engineParams.SetEnableQuic(true)
-		engineParams.SetEnableBrotli(true)
-		t.Engine = NewEngine()
-		t.Engine.StartWithParams(engineParams)
-		engineParams.Destroy()
-		t.closeEngine = true
-		runtime.SetFinalizer(t, (*RoundTripper).close)
-	}
-	var emptyExecutor Executor
-	if t.Executor == emptyExecutor {
-		t.Executor = NewExecutor(func(executor Executor, command Runnable) {
-			go func() {
-				command.Run()
-				command.Destroy()
-			}()
-		})
-		t.closeExecutor = true
-		if !t.closeEngine {
-			runtime.SetFinalizer(t, (*RoundTripper).close)
-		}
-	}
 
 	requestParams := NewURLRequestParams()
 	if request.Method == "" {
