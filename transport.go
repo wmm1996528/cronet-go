@@ -38,7 +38,6 @@ func (t *RoundTripper) RoundTrip(request *http.Request) (*http.Response, error) 
 		engineParams.SetEnableHTTP2(true)
 		engineParams.SetEnableQuic(true)
 		engineParams.SetEnableBrotli(true)
-		engineParams.SetUserAgent("Go-http-client/1.1")
 		t.Engine = NewEngine()
 		t.Engine.StartWithParams(engineParams)
 		engineParams.Destroy()
@@ -67,11 +66,13 @@ func (t *RoundTripper) RoundTrip(request *http.Request) (*http.Response, error) 
 	}
 	for key, values := range request.Header {
 		for _, value := range values {
-			header := NewHTTPHeader()
-			header.SetName(key)
-			header.SetValue(value)
-			requestParams.AddHeader(header)
-			header.Destroy()
+			if len(value) > 0 {
+				header := NewHTTPHeader()
+				header.SetName(key)
+				header.SetValue(value)
+				requestParams.AddHeader(header)
+				header.Destroy()
+			}
 		}
 	}
 	if request.Body != nil {
@@ -135,19 +136,17 @@ func (r *urlResponse) monitorContext(ctx context.Context) {
 }
 
 func (r *urlResponse) OnRedirectReceived(self URLRequestCallback, request URLRequest, info URLResponseInfo, newLocationUrl string) {
-	if r.checkRedirect != nil && !r.checkRedirect(newLocationUrl) {
-		r.response.Status = info.StatusText()
-		r.response.StatusCode = info.StatusCode()
-		headerLen := info.HeaderSize()
-		for i := 0; i < headerLen; i++ {
-			header := info.HeaderAt(i)
-			r.response.Header.Set(header.Name(), header.Value())
-		}
-		r.response.Body = io.NopCloser(io.MultiReader())
-		r.wg.Done()
-		return
+	r.response.Status = info.StatusText()
+	r.response.StatusCode = info.StatusCode()
+	headerLen := info.HeaderSize()
+	for i := 0; i < headerLen; i++ {
+		header := info.HeaderAt(i)
+		r.response.Header.Set(header.Name(), header.Value())
 	}
-	request.FollowRedirect()
+	r.response.Body = io.NopCloser(io.MultiReader())
+	request.Cancel()
+	r.wg.Done()
+	return
 }
 
 func (r *urlResponse) OnResponseStarted(self URLRequestCallback, request URLRequest, info URLResponseInfo) {
