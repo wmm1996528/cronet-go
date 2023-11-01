@@ -13,7 +13,7 @@ import (
 
 // RoundTripper is a wrapper from URLRequest to http.RoundTripper
 type RoundTripper struct {
-	CheckRedirect func(newLocationUrl string) bool
+	ShouldFollowRedirect bool
 	Engine        Engine
 	Executor      Executor
 
@@ -21,18 +21,13 @@ type RoundTripper struct {
 	closeExecutor bool
 }
 
-func NewCronetRoundTripper(userAgent string) *RoundTripper {
-	t := &RoundTripper{}
-	engineParams := NewEngineParams()
-	engineParams.SetEnableHTTP2(true)
-	engineParams.SetEnableQuic(true)
-	engineParams.SetEnableBrotli(true)
-	if len(userAgent) != 0 {
-		engineParams.SetUserAgent(userAgent)
+func NewCronetRoundTripperWithParams(params EngineParams, ShouldFollowRedirect bool) *RoundTripper {
+	t := &RoundTripper{
+		ShouldFollowRedirect: ShouldFollowRedirect,
 	}
 	t.Engine = NewEngine()
-	t.Engine.StartWithParams(engineParams)
-	engineParams.Destroy()
+	t.Engine.StartWithParams(params)
+	params.Destroy()
 	t.closeEngine = true
 
 	t.Executor = NewExecutor(func(executor Executor, command Runnable) {
@@ -44,6 +39,15 @@ func NewCronetRoundTripper(userAgent string) *RoundTripper {
 	t.closeExecutor = true
 	runtime.SetFinalizer(t, (*RoundTripper).close)
 	return t
+}
+
+func NewCronetRoundTripperWithDefaultParams() *RoundTripper {
+	engineParams := NewEngineParams()
+	engineParams.SetEnableHTTP2(true)
+	engineParams.SetEnableQuic(true)
+	engineParams.SetEnableBrotli(true)
+	engineParams.SetUserAgent("Go-cronet-http-client")
+	return NewCronetRoundTripperWithParams(engineParams, false)
 }
 
 func (t *RoundTripper) close() {
@@ -66,13 +70,15 @@ func (t *RoundTripper) RoundTrip(request *http.Request) (*http.Response, error) 
 	}
 	for key, values := range request.Header {
 		for _, value := range values {
-			if len(value) > 0 {
-				header := NewHTTPHeader()
-				header.SetName(key)
-				header.SetValue(value)
-				requestParams.AddHeader(header)
-				header.Destroy()
+			if len(value) == 0 {
+				continue
 			}
+			header := NewHTTPHeader()
+			header.SetName(key)
+			header.SetValue(value)
+			requestParams.AddHeader(header)
+			header.Destroy()
+
 		}
 	}
 	if request.Body != nil {
@@ -81,7 +87,7 @@ func (t *RoundTripper) RoundTrip(request *http.Request) (*http.Response, error) 
 		requestParams.SetUploadDataExecutor(t.Executor)
 	}
 	responseHandler := urlResponse{
-		checkRedirect: t.CheckRedirect,
+		ShouldFollowRedirect: t.ShouldFollowRedirect,
 		response: http.Response{
 			Request:    request,
 			Proto:      request.Proto,
@@ -108,7 +114,7 @@ func (t *RoundTripper) RoundTrip(request *http.Request) (*http.Response, error) 
 }
 
 type urlResponse struct {
-	checkRedirect func(newLocationUrl string) bool
+	ShouldFollowRedirect bool
 
 	wg       sync.WaitGroup
 	request  URLRequest
@@ -136,17 +142,21 @@ func (r *urlResponse) monitorContext(ctx context.Context) {
 }
 
 func (r *urlResponse) OnRedirectReceived(self URLRequestCallback, request URLRequest, info URLResponseInfo, newLocationUrl string) {
-	r.response.Status = info.StatusText()
-	r.response.StatusCode = info.StatusCode()
-	headerLen := info.HeaderSize()
-	for i := 0; i < headerLen; i++ {
-		header := info.HeaderAt(i)
-		r.response.Header.Set(header.Name(), header.Value())
+	if !r.ShouldFollowRedirect {
+		// No need to let cronet follow further redirect after first HTTP response
+		r.response.Status = info.StatusText()
+		r.response.StatusCode = info.StatusCode()
+		headerLen := info.HeaderSize()
+		for i := 0; i < headerLen; i++ {
+			header := info.HeaderAt(i)
+			r.response.Header.Set(header.Name(), header.Value())
+		}
+		r.response.Body = io.NopCloser(io.MultiReader())
+		request.Cancel()
+		r.wg.Done()
+	} else {
+		request.FollowRedirect()
 	}
-	r.response.Body = io.NopCloser(io.MultiReader())
-	request.Cancel()
-	r.wg.Done()
-	return
 }
 
 func (r *urlResponse) OnResponseStarted(self URLRequestCallback, request URLRequest, info URLResponseInfo) {
