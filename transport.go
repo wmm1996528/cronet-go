@@ -21,12 +21,15 @@ type RoundTripper struct {
 	closeExecutor bool
 }
 
-func NewCronetRoundTripper() *RoundTripper {
+func NewCronetRoundTripper(userAgent string) *RoundTripper {
 	t := &RoundTripper{}
 	engineParams := NewEngineParams()
 	engineParams.SetEnableHTTP2(true)
 	engineParams.SetEnableQuic(true)
 	engineParams.SetEnableBrotli(true)
+	if len(userAgent) != 0 {
+		engineParams.SetUserAgent(userAgent)
+	}
 	t.Engine = NewEngine()
 	t.Engine.StartWithParams(engineParams)
 	engineParams.Destroy()
