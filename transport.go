@@ -13,17 +13,17 @@ import (
 
 // RoundTripper is a wrapper from URLRequest to http.RoundTripper
 type RoundTripper struct {
-	ShouldFollowRedirect bool
-	Engine        Engine
+	FollowRedirect bool
+	Engine         Engine
 	Executor      Executor
 
 	closeEngine   bool
 	closeExecutor bool
 }
 
-func NewCronetRoundTripperWithParams(params EngineParams, ShouldFollowRedirect bool) *RoundTripper {
+func NewCronetTransport(params EngineParams, FollowRedirect bool) *RoundTripper {
 	t := &RoundTripper{
-		ShouldFollowRedirect: ShouldFollowRedirect,
+		FollowRedirect: FollowRedirect,
 	}
 	t.Engine = NewEngine()
 	t.Engine.StartWithParams(params)
@@ -41,13 +41,13 @@ func NewCronetRoundTripperWithParams(params EngineParams, ShouldFollowRedirect b
 	return t
 }
 
-func NewCronetRoundTripperWithDefaultParams() *RoundTripper {
+func NewCronetTransportWithDefaultParams() *RoundTripper {
 	engineParams := NewEngineParams()
 	engineParams.SetEnableHTTP2(true)
 	engineParams.SetEnableQuic(true)
 	engineParams.SetEnableBrotli(true)
 	engineParams.SetUserAgent("Go-cronet-http-client")
-	return NewCronetRoundTripperWithParams(engineParams, false)
+	return NewCronetTransport(engineParams, true)
 }
 
 func (t *RoundTripper) close() {
@@ -87,7 +87,7 @@ func (t *RoundTripper) RoundTrip(request *http.Request) (*http.Response, error) 
 		requestParams.SetUploadDataExecutor(t.Executor)
 	}
 	responseHandler := urlResponse{
-		ShouldFollowRedirect: t.ShouldFollowRedirect,
+		FollowRedirect: t.FollowRedirect,
 		response: http.Response{
 			Request:    request,
 			Proto:      request.Proto,
@@ -114,7 +114,7 @@ func (t *RoundTripper) RoundTrip(request *http.Request) (*http.Response, error) 
 }
 
 type urlResponse struct {
-	ShouldFollowRedirect bool
+	FollowRedirect bool
 
 	wg       sync.WaitGroup
 	request  URLRequest
@@ -142,21 +142,20 @@ func (r *urlResponse) monitorContext(ctx context.Context) {
 }
 
 func (r *urlResponse) OnRedirectReceived(self URLRequestCallback, request URLRequest, info URLResponseInfo, newLocationUrl string) {
-	if !r.ShouldFollowRedirect {
-		// No need to let cronet follow further redirect after first HTTP response
-		r.response.Status = info.StatusText()
-		r.response.StatusCode = info.StatusCode()
-		headerLen := info.HeaderSize()
-		for i := 0; i < headerLen; i++ {
-			header := info.HeaderAt(i)
-			r.response.Header.Set(header.Name(), header.Value())
-		}
-		r.response.Body = io.NopCloser(io.MultiReader())
-		request.Cancel()
-		r.wg.Done()
-	} else {
+	if r.FollowRedirect {
 		request.FollowRedirect()
 	}
+	// No need to let cronet follow further redirect after first HTTP response
+	r.response.Status = info.StatusText()
+	r.response.StatusCode = info.StatusCode()
+	headerLen := info.HeaderSize()
+	for i := 0; i < headerLen; i++ {
+		header := info.HeaderAt(i)
+		r.response.Header.Set(header.Name(), header.Value())
+	}
+	r.response.Body = io.NopCloser(io.MultiReader())
+	request.Cancel()
+	r.wg.Done()
 }
 
 func (r *urlResponse) OnResponseStarted(self URLRequestCallback, request URLRequest, info URLResponseInfo) {
