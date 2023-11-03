@@ -1,6 +1,7 @@
 package main
 
 import (
+
 	"flag"
 	"io"
 	"log"
@@ -19,7 +20,10 @@ func main() {
 	}
 
 	client := &http.Client{
-		Transport: &cronet.RoundTripper{},
+		Transport: cronet.NewCronetTransportWithDefaultParams(),
+		CheckRedirect: func(req *http.Request, via []*http.Request) error {
+			return http.ErrUseLastResponse
+		},
 	}
 	resp, err := client.Get(url)
 	if err != nil {

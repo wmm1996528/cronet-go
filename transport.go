@@ -13,12 +13,41 @@ import (
 
 // RoundTripper is a wrapper from URLRequest to http.RoundTripper
 type RoundTripper struct {
-	CheckRedirect func(newLocationUrl string) bool
-	Engine        Engine
+	FollowRedirect bool
+	Engine         Engine
 	Executor      Executor
 
 	closeEngine   bool
 	closeExecutor bool
+}
+
+func NewCronetTransport(params EngineParams, FollowRedirect bool) *RoundTripper {
+	t := &RoundTripper{
+		FollowRedirect: FollowRedirect,
+	}
+	t.Engine = NewEngine()
+	t.Engine.StartWithParams(params)
+	params.Destroy()
+	t.closeEngine = true
+
+	t.Executor = NewExecutor(func(executor Executor, command Runnable) {
+		go func() {
+			command.Run()
+			command.Destroy()
+		}()
+	})
+	t.closeExecutor = true
+	runtime.SetFinalizer(t, (*RoundTripper).close)
+	return t
+}
+
+func NewCronetTransportWithDefaultParams() *RoundTripper {
+	engineParams := NewEngineParams()
+	engineParams.SetEnableHTTP2(true)
+	engineParams.SetEnableQuic(true)
+	engineParams.SetEnableBrotli(true)
+	engineParams.SetUserAgent("Go-cronet-http-client")
+	return NewCronetTransport(engineParams, true)
 }
 
 func (t *RoundTripper) close() {
@@ -32,32 +61,6 @@ func (t *RoundTripper) close() {
 }
 
 func (t *RoundTripper) RoundTrip(request *http.Request) (*http.Response, error) {
-	var emptyEngine Engine
-	if t.Engine == emptyEngine {
-		engineParams := NewEngineParams()
-		engineParams.SetEnableHTTP2(true)
-		engineParams.SetEnableQuic(true)
-		engineParams.SetEnableBrotli(true)
-		engineParams.SetUserAgent("Go-http-client/1.1")
-		t.Engine = NewEngine()
-		t.Engine.StartWithParams(engineParams)
-		engineParams.Destroy()
-		t.closeEngine = true
-		runtime.SetFinalizer(t, (*RoundTripper).close)
-	}
-	var emptyExecutor Executor
-	if t.Executor == emptyExecutor {
-		t.Executor = NewExecutor(func(executor Executor, command Runnable) {
-			go func() {
-				command.Run()
-				command.Destroy()
-			}()
-		})
-		t.closeExecutor = true
-		if !t.closeEngine {
-			runtime.SetFinalizer(t, (*RoundTripper).close)
-		}
-	}
 
 	requestParams := NewURLRequestParams()
 	if request.Method == "" {
@@ -67,11 +70,15 @@ func (t *RoundTripper) RoundTrip(request *http.Request) (*http.Response, error) 
 	}
 	for key, values := range request.Header {
 		for _, value := range values {
+			if len(value) == 0 {
+				continue
+			}
 			header := NewHTTPHeader()
 			header.SetName(key)
 			header.SetValue(value)
 			requestParams.AddHeader(header)
 			header.Destroy()
+
 		}
 	}
 	if request.Body != nil {
@@ -80,7 +87,7 @@ func (t *RoundTripper) RoundTrip(request *http.Request) (*http.Response, error) 
 		requestParams.SetUploadDataExecutor(t.Executor)
 	}
 	responseHandler := urlResponse{
-		checkRedirect: t.CheckRedirect,
+		FollowRedirect: t.FollowRedirect,
 		response: http.Response{
 			Request:    request,
 			Proto:      request.Proto,
@@ -107,7 +114,7 @@ func (t *RoundTripper) RoundTrip(request *http.Request) (*http.Response, error) 
 }
 
 type urlResponse struct {
-	checkRedirect func(newLocationUrl string) bool
+	FollowRedirect bool
 
 	wg       sync.WaitGroup
 	request  URLRequest
@@ -135,19 +142,20 @@ func (r *urlResponse) monitorContext(ctx context.Context) {
 }
 
 func (r *urlResponse) OnRedirectReceived(self URLRequestCallback, request URLRequest, info URLResponseInfo, newLocationUrl string) {
-	if r.checkRedirect != nil && !r.checkRedirect(newLocationUrl) {
-		r.response.Status = info.StatusText()
-		r.response.StatusCode = info.StatusCode()
-		headerLen := info.HeaderSize()
-		for i := 0; i < headerLen; i++ {
-			header := info.HeaderAt(i)
-			r.response.Header.Set(header.Name(), header.Value())
-		}
-		r.response.Body = io.NopCloser(io.MultiReader())
-		r.wg.Done()
-		return
+	if r.FollowRedirect {
+		request.FollowRedirect()
 	}
-	request.FollowRedirect()
+	// No need to let cronet follow further redirect after first HTTP response
+	r.response.Status = info.StatusText()
+	r.response.StatusCode = info.StatusCode()
+	headerLen := info.HeaderSize()
+	for i := 0; i < headerLen; i++ {
+		header := info.HeaderAt(i)
+		r.response.Header.Set(header.Name(), header.Value())
+	}
+	r.response.Body = io.NopCloser(io.MultiReader())
+	request.Cancel()
+	r.wg.Done()
 }
 
 func (r *urlResponse) OnResponseStarted(self URLRequestCallback, request URLRequest, info URLResponseInfo) {
