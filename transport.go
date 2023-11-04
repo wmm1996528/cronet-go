@@ -15,7 +15,7 @@ import (
 type RoundTripper struct {
 	FollowRedirect bool
 	Engine         Engine
-	Executor      Executor
+	Executor       Executor
 
 	closeEngine   bool
 	closeExecutor bool
@@ -141,38 +141,6 @@ func (r *urlResponse) monitorContext(ctx context.Context) {
 	}
 }
 
-func (r *urlResponse) OnRedirectReceived(self URLRequestCallback, request URLRequest, info URLResponseInfo, newLocationUrl string) {
-	if r.FollowRedirect {
-		request.FollowRedirect()
-	}
-	// No need to let cronet follow further redirect after first HTTP response
-	r.response.Status = info.StatusText()
-	r.response.StatusCode = info.StatusCode()
-	headerLen := info.HeaderSize()
-	for i := 0; i < headerLen; i++ {
-		header := info.HeaderAt(i)
-		r.response.Header.Set(header.Name(), header.Value())
-	}
-	r.response.Body = io.NopCloser(io.MultiReader())
-	request.Cancel()
-	r.wg.Done()
-}
-
-func (r *urlResponse) OnResponseStarted(self URLRequestCallback, request URLRequest, info URLResponseInfo) {
-	r.response.Status = info.StatusText()
-	r.response.StatusCode = info.StatusCode()
-	headerLen := info.HeaderSize()
-
-	for i := 0; i < headerLen; i++ {
-		header := info.HeaderAt(i)
-		r.response.Header.Set(header.Name(), header.Value())
-	}
-	contentLength, _ := strconv.Atoi(r.response.Header.Get("Content-Length"))
-	r.response.ContentLength = int64(contentLength)
-	r.response.TransferEncoding = r.response.Header.Values("Content-Transfer-Encoding")
-	r.wg.Done()
-}
-
 func (r *urlResponse) Read(p []byte) (n int, err error) {
 	select {
 	case <-r.done:
@@ -216,6 +184,39 @@ func (r *urlResponse) Close() error {
 		r.request.Cancel()
 	}
 	return nil
+}
+
+func (r *urlResponse) OnRedirectReceived(self URLRequestCallback, request URLRequest, info URLResponseInfo, newLocationUrl string) {
+	if r.FollowRedirect {
+		request.FollowRedirect()
+		return
+	}
+	// No need to let cronet follow further redirect after first HTTP response
+	r.response.Status = info.StatusText()
+	r.response.StatusCode = info.StatusCode()
+	headerLen := info.HeaderSize()
+	for i := 0; i < headerLen; i++ {
+		header := info.HeaderAt(i)
+		r.response.Header.Set(header.Name(), header.Value())
+	}
+	r.response.Body = io.NopCloser(io.MultiReader())
+	request.Cancel()
+	r.wg.Done()
+}
+
+func (r *urlResponse) OnResponseStarted(self URLRequestCallback, request URLRequest, info URLResponseInfo) {
+	r.response.Status = info.StatusText()
+	r.response.StatusCode = info.StatusCode()
+	headerLen := info.HeaderSize()
+
+	for i := 0; i < headerLen; i++ {
+		header := info.HeaderAt(i)
+		r.response.Header.Set(header.Name(), header.Value())
+	}
+	contentLength, _ := strconv.Atoi(r.response.Header.Get("Content-Length"))
+	r.response.ContentLength = int64(contentLength)
+	r.response.TransferEncoding = r.response.Header.Values("Content-Transfer-Encoding")
+	r.wg.Done()
 }
 
 func (r *urlResponse) OnReadCompleted(self URLRequestCallback, request URLRequest, info URLResponseInfo, buffer Buffer, bytesRead int64) {
