@@ -77,7 +77,7 @@ func (e Engine) DefaultUserAgent() string {
 	return C.GoString(C.Cronet_Engine_GetDefaultUserAgent(e.ptr))
 }
 
-// AddRequestedFinishListener registers a listener that gets called at the end of each request.
+// AddRequestFinishedListener registers a listener that gets called at the end of each request.
 //
 // The listener is called on Executor.
 //
@@ -119,10 +119,10 @@ func (e Engine) RemoveRequestFinishedListener(listener URLRequestFinishedInfoLis
 	C.Cronet_Engine_RemoveRequestFinishedListener(e.ptr, listener.ptr)
 }
 
-// Configures all subsequent connections to server designated with {@code host_port_pair}
+// SetClientCertificate Configures all subsequent connections to server designated with {@code hostPortPair}
 // to authenticate with {@code client_cert_data} and {@code private_key_data} when requested.
-// {@code client_cert_data} is supposed to be DER encoded.
-// {@code private_key_data} is supposed to be PEM encoded.
+// {@code clientCertData} is supposed to be DER encoded.
+// {@code privateKeyData} is supposed to be PEM encoded.
 //
 // The method can be called only after the engine is started.
 func (e Engine) SetClientCertificate(hostPortPair string, clientCertData []byte, privateKeyData []byte) {
@@ -137,7 +137,7 @@ func (e Engine) SetClientCertificate(hostPortPair string, clientCertData []byte,
 	C.free(unsafe.Pointer(cHostPortPair))
 }
 
-// Clears a client certificate preference for server designated with {@code host_port_pair}
+// ClearClientCertificate Clears a client certificate preference for server designated with {@code hostPortPair}
 // set by SetClientCertificate(). Returns true if one was removed and false otherwise.
 //
 // The method can be called only after the engine is started.
