@@ -35,17 +35,12 @@ func (e Engine) StartWithParams(params EngineParams) Result {
 // The file can be viewed using a Chrome browser navigated to
 // chrome://net-internals/#import
 // Returns |true| if netlog has started successfully, |false| otherwise.
-// @param fileName the complete file path. It must not be empty. If the file
-//
-//	exists, it is truncated before starting. If actively logging,
-//	this method is ignored.
-//
-// @param logAll to include basic events, user cookies,
-//
-//	credentials and all transferred bytes in the log. This option presents
-//	a privacy risk, since it exposes the user's credentials, and should
-//	only be used with the user's consent and in situations where the log
-//	won't be public. false to just include basic events.
+// Parameter |fileName| the complete file path. It must not be empty. If the file
+// exists, it is truncated before starting. If actively logging, this method is ignored.
+// Parameter |logAll| to include basic events, user cookies, credentials and all transferred
+// bytes in the log. This option presentsa privacy risk, since it exposes the user's credentials,
+// and should only be used with the user's consent and in situations where the log won't be public.
+// false to just include basic events.
 func (e Engine) StartNetLogToFile(fileName string, logAll bool) bool {
 	cPath := C.CString(fileName)
 	result := C.Cronet_Engine_StartNetLogToFile(e.ptr, cPath, C.bool(logAll))
@@ -130,12 +125,12 @@ func (e Engine) RemoveRequestFinishedListener(listener URLRequestFinishedInfoLis
 // {@code private_key_data} is supposed to be PEM encoded.
 //
 // The method can be called only after the engine is started.
-func (e Engine) SetClientCertificate(host_port_pair string, client_cert_data []byte, private_key_data []byte) {
-	cHostPortPair := C.CString(host_port_pair)
+func (e Engine) SetClientCertificate(hostPortPair string, clientCertData []byte, privateKeyData []byte) {
+	cHostPortPair := C.CString(hostPortPair)
 	clientCertBuffer := NewBuffer()
-	clientCertBuffer.InitWithDataAndCallback(client_cert_data, NewBufferCallback(nil))
+	clientCertBuffer.InitWithDataAndCallback(clientCertData, NewBufferCallback(nil))
 	privateKeyBuffer := NewBuffer()
-	privateKeyBuffer.InitWithDataAndCallback(private_key_data, NewBufferCallback(nil))
+	privateKeyBuffer.InitWithDataAndCallback(privateKeyData, NewBufferCallback(nil))
 	C.Cronet_Engine_SetClientCertificate(e.ptr, cHostPortPair, clientCertBuffer.ptr, privateKeyBuffer.ptr)
 	clientCertBuffer.Destroy()
 	privateKeyBuffer.Destroy()
@@ -146,8 +141,8 @@ func (e Engine) SetClientCertificate(host_port_pair string, client_cert_data []b
 // set by SetClientCertificate(). Returns true if one was removed and false otherwise.
 //
 // The method can be called only after the engine is started.
-func (e Engine) ClearClientCertificate(host_port_pair string) bool {
-	cHostPortPair := C.CString(host_port_pair)
+func (e Engine) ClearClientCertificate(hostPortPair string) bool {
+	cHostPortPair := C.CString(hostPortPair)
 	result := C.Cronet_Engine_ClearClientCertificate(e.ptr, cHostPortPair)
 	C.free(unsafe.Pointer(cHostPortPair))
 	return bool(result)
