@@ -36,13 +36,16 @@ func (e Engine) StartWithParams(params EngineParams) Result {
 // chrome://net-internals/#import
 // Returns |true| if netlog has started successfully, |false| otherwise.
 // @param fileName the complete file path. It must not be empty. If the file
-//   exists, it is truncated before starting. If actively logging,
-//   this method is ignored.
+//
+//	exists, it is truncated before starting. If actively logging,
+//	this method is ignored.
+//
 // @param logAll to include basic events, user cookies,
-//   credentials and all transferred bytes in the log. This option presents
-//   a privacy risk, since it exposes the user's credentials, and should
-//   only be used with the user's consent and in situations where the log
-//   won't be public. false to just include basic events.
+//
+//	credentials and all transferred bytes in the log. This option presents
+//	a privacy risk, since it exposes the user's credentials, and should
+//	only be used with the user's consent and in situations where the log
+//	won't be public. false to just include basic events.
 func (e Engine) StartNetLogToFile(fileName string, logAll bool) bool {
 	cPath := C.CString(fileName)
 	result := C.Cronet_Engine_StartNetLogToFile(e.ptr, cPath, C.bool(logAll))
@@ -79,7 +82,7 @@ func (e Engine) DefaultUserAgent() string {
 	return C.GoString(C.Cronet_Engine_GetDefaultUserAgent(e.ptr))
 }
 
-// AddRequestFinishListener registers a listener that gets called at the end of each request.
+// AddRequestedFinishListener registers a listener that gets called at the end of each request.
 //
 // The listener is called on Executor.
 //
@@ -111,12 +114,41 @@ func (e Engine) DefaultUserAgent() string {
 //
 // @param listener the listener for finished requests.
 // @param executor the executor upon which to run listener.
-func (e Engine) AddRequestFinishListener(listener URLRequestFinishedInfoListener, executor Executor) {
+func (e Engine) AddRequestFinishedListener(listener URLRequestFinishedInfoListener, executor Executor) {
 	C.Cronet_Engine_AddRequestFinishedListener(e.ptr, listener.ptr, executor.ptr)
 }
 
-// RemoveRequestFinishListener unregisters a RequestFinishedInfoListener,
+// RemoveRequestFinishedListener unregisters a RequestFinishedInfoListener,
 // including its association with its registered Executor.
-func (e Engine) RemoveRequestFinishListener(listener URLRequestFinishedInfoListener) {
+func (e Engine) RemoveRequestFinishedListener(listener URLRequestFinishedInfoListener) {
 	C.Cronet_Engine_RemoveRequestFinishedListener(e.ptr, listener.ptr)
+}
+
+// Configures all subsequent connections to server designated with {@code host_port_pair}
+// to authenticate with {@code client_cert_data} and {@code private_key_data} when requested.
+// {@code client_cert_data} is supposed to be DER encoded.
+// {@code private_key_data} is supposed to be PEM encoded.
+//
+// The method can be called only after the engine is started.
+func (e Engine) SetClientCertificate(host_port_pair string, client_cert_data []byte, private_key_data []byte) {
+	cHostPortPair := C.CString(host_port_pair)
+	clientCertBuffer := NewBuffer()
+	clientCertBuffer.InitWithDataAndCallback(client_cert_data, NewBufferCallback(nil))
+	privateKeyBuffer := NewBuffer()
+	privateKeyBuffer.InitWithDataAndCallback(private_key_data, NewBufferCallback(nil))
+	C.Cronet_Engine_SetClientCertificate(e.ptr, cHostPortPair, clientCertBuffer.ptr, privateKeyBuffer.ptr)
+	clientCertBuffer.Destroy()
+	privateKeyBuffer.Destroy()
+	C.free(unsafe.Pointer(cHostPortPair))
+}
+
+// Clears a client certificate preference for server designated with {@code host_port_pair}
+// set by SetClientCertificate(). Returns true if one was removed and false otherwise.
+//
+// The method can be called only after the engine is started.
+func (e Engine) ClearClientCertificate(host_port_pair string) bool {
+	cHostPortPair := C.CString(host_port_pair)
+	result := C.Cronet_Engine_ClearClientCertificate(e.ptr, cHostPortPair)
+	C.free(unsafe.Pointer(cHostPortPair))
+	return bool(result)
 }

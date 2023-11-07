@@ -86,6 +86,7 @@ func (t *RoundTripper) RoundTrip(request *http.Request) (*http.Response, error) 
 		requestParams.SetUploadDataProvider(uploadProvider)
 		requestParams.SetUploadDataExecutor(t.Executor)
 	}
+	m := &sync.Mutex{}
 	responseHandler := urlResponse{
 		FollowRedirect: t.FollowRedirect,
 		response: http.Response{
@@ -95,12 +96,12 @@ func (t *RoundTripper) RoundTrip(request *http.Request) (*http.Response, error) 
 			ProtoMinor: request.ProtoMinor,
 			Header:     make(http.Header),
 		},
-		read:   make(chan int),
-		cancel: make(chan struct{}),
-		done:   make(chan struct{}),
+		complete: sync.NewCond(m),
+		read:     make(chan int),
+		cancel:   make(chan struct{}),
+		done:     make(chan struct{}),
 	}
 	responseHandler.response.Body = &responseHandler
-	responseHandler.wg.Add(1)
 	go responseHandler.monitorContext(request.Context())
 
 	callback := NewURLRequestCallback(&responseHandler)
@@ -109,14 +110,15 @@ func (t *RoundTripper) RoundTrip(request *http.Request) (*http.Response, error) 
 	urlRequest.InitWithParams(t.Engine, request.URL.String(), requestParams, callback, t.Executor)
 	requestParams.Destroy()
 	urlRequest.Start()
-	responseHandler.wg.Wait()
+	m.Lock()
+	responseHandler.complete.Wait()
 	return &responseHandler.response, responseHandler.err
 }
 
 type urlResponse struct {
 	FollowRedirect bool
 
-	wg       sync.WaitGroup
+	complete *sync.Cond
 	request  URLRequest
 	response http.Response
 	err      error
@@ -202,7 +204,7 @@ func (r *urlResponse) OnRedirectReceived(self URLRequestCallback, request URLReq
 	}
 	r.response.Body = io.NopCloser(io.MultiReader())
 	request.Cancel()
-	r.wg.Done()
+	r.complete.Signal()
 }
 
 func (r *urlResponse) OnResponseStarted(self URLRequestCallback, request URLRequest, info URLResponseInfo) {
@@ -218,7 +220,7 @@ func (r *urlResponse) OnResponseStarted(self URLRequestCallback, request URLRequ
 	r.response.ContentLength = int64(contentLength)
 	r.response.TransferEncoding = r.response.Header.Values("Content-Transfer-Encoding")
 	r.response.Close = true
-	r.wg.Done()
+	r.complete.Signal()
 }
 
 func (r *urlResponse) OnReadCompleted(self URLRequestCallback, request URLRequest, info URLResponseInfo, buffer Buffer, bytesRead int64) {
@@ -266,6 +268,7 @@ func (r *urlResponse) close(request URLRequest, err error) {
 	}
 
 	close(r.done)
+	r.complete.Signal()
 	request.Destroy()
 }
 
