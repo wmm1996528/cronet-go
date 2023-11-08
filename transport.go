@@ -152,6 +152,7 @@ func (r *urlResponse) Read(p []byte) (n int, err error) {
 
 	select {
 	case <-r.done:
+		r.access.Unlock()
 		return 0, r.err
 	default:
 	}
@@ -178,7 +179,7 @@ func (r *urlResponse) Close() error {
 	case <-r.cancel:
 		return os.ErrClosed
 	case <-r.done:
-		return os.ErrClosed
+		return nil
 	default:
 		close(r.cancel)
 		r.request.Cancel()
@@ -216,6 +217,7 @@ func (r *urlResponse) OnResponseStarted(self URLRequestCallback, request URLRequ
 	contentLength, _ := strconv.Atoi(r.response.Header.Get("Content-Length"))
 	r.response.ContentLength = int64(contentLength)
 	r.response.TransferEncoding = r.response.Header.Values("Content-Transfer-Encoding")
+	r.response.Close = true
 	r.wg.Done()
 }
 
