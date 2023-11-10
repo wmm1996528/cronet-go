@@ -23,7 +23,7 @@ mkdir /usr/local/lib/cronet
 
 cp out/Cronet/cronet/include/* /usr/local/include/cronet
 cp out/Cronet/*.dylib /usr/local/lib/cronet
-ln -s /usr/local/lib/cronet/libcronet.*.dylib /usr/local/lib/cronet/libcronet.dylib
+ln -sf /usr/local/lib/cronet/libcronet.*.dylib /usr/local/lib/cronet/libcronet.dylib
 ```
 
 ## Use cronet-go
