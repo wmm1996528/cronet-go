@@ -239,8 +239,9 @@ func (r *urlResponse) OnResponseStarted(self URLRequestCallback, request URLRequ
 		r.response.Header.Set(header.Name(), header.Value())
 	}
 	if resetContentLength {
+		r.response.Uncompressed = true
 		r.response.ContentLength = -1
-		r.response.Header.Set("Content-Length", strconv.FormatInt(r.response.ContentLength, 10))
+		r.response.Header.Del("Content-Length")
 	} else {
 		r.response.ContentLength, _ = strconv.ParseInt(r.response.Header.Get("Content-Length"), 10, 64)
 	}
