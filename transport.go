@@ -5,9 +5,11 @@ import (
 	"io"
 	"net"
 	"net/http"
+	"net/textproto"
 	"os"
 	"runtime"
 	"strconv"
+	"strings"
 	"sync"
 )
 
@@ -189,6 +191,18 @@ func (r *urlResponse) Close() error {
 	return nil
 }
 
+// Cronet automatically decompresses body content if one of these encodings is used
+var cronetEncodings = []string{"br", "deflate", "gzip", "x-gzip", "zstd"}
+
+func stringInSlice(a string, list []string) bool {
+	for _, b := range list {
+		if b == a {
+			return true
+		}
+	}
+	return false
+}
+
 func (r *urlResponse) OnRedirectReceived(self URLRequestCallback, request URLRequest, info URLResponseInfo, newLocationUrl string) {
 	if r.FollowRedirect {
 		request.FollowRedirect()
@@ -212,12 +226,25 @@ func (r *urlResponse) OnResponseStarted(self URLRequestCallback, request URLRequ
 	r.response.StatusCode = info.StatusCode()
 	headerLen := info.HeaderSize()
 
+	resetContentLength := false
 	for i := 0; i < headerLen; i++ {
 		header := info.HeaderAt(i)
+		// Drop Content-Encoding header if body has been decompressed already
+		// and reset Content-Length to unknown after loop completes
+		if textproto.CanonicalMIMEHeaderKey(header.Name()) == "Content-Encoding" &&
+			stringInSlice(strings.ToLower(header.Value()), cronetEncodings) {
+			resetContentLength = true
+			continue
+		}
 		r.response.Header.Set(header.Name(), header.Value())
 	}
-	contentLength, _ := strconv.Atoi(r.response.Header.Get("Content-Length"))
-	r.response.ContentLength = int64(contentLength)
+	if resetContentLength {
+		r.response.Uncompressed = true
+		r.response.ContentLength = -1
+		r.response.Header.Del("Content-Length")
+	} else {
+		r.response.ContentLength, _ = strconv.ParseInt(r.response.Header.Get("Content-Length"), 10, 64)
+	}
 	r.response.TransferEncoding = r.response.Header.Values("Content-Transfer-Encoding")
 	r.response.Close = true
 	r.complete.Signal()
@@ -287,6 +314,9 @@ func (p *bodyUploadProvider) Read(self UploadDataProvider, sink UploadDataSink, 
 	if err != nil {
 		if p.contentLength == -1 && err == io.EOF {
 			sink.OnReadSucceeded(0, true)
+			return
+		} else if err == io.EOF {
+			sink.OnReadSucceeded(int64(n), false)
 			return
 		}
 		sink.OnReadError(err.Error())
