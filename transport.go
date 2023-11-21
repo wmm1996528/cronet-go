@@ -2,12 +2,14 @@ package cronet
 
 import (
 	"context"
+	"errors"
 	"io"
 	"net"
 	"net/http"
 	"net/textproto"
 	"os"
 	"runtime"
+	"slices"
 	"strconv"
 	"strings"
 	"sync"
@@ -39,7 +41,7 @@ func NewCronetTransport(params EngineParams, FollowRedirect bool) *RoundTripper 
 		}()
 	})
 	t.closeExecutor = true
-	runtime.SetFinalizer(t, (*RoundTripper).close)
+	runtime.SetFinalizer(t, (*RoundTripper).Close)
 	return t
 }
 
@@ -52,14 +54,18 @@ func NewCronetTransportWithDefaultParams() *RoundTripper {
 	return NewCronetTransport(engineParams, true)
 }
 
-func (t *RoundTripper) close() {
+func (t *RoundTripper) Close() error {
 	if t.closeEngine {
-		t.Engine.Shutdown()
+		result := t.Engine.Shutdown()
+		if result != ResultSuccess {
+			return errors.New("engine still has active requests, so couldn't shutdown")
+		}
 		t.Engine.Destroy()
 	}
 	if t.closeExecutor {
 		t.Executor.Destroy()
 	}
+	return nil
 }
 
 func (t *RoundTripper) RoundTrip(request *http.Request) (*http.Response, error) {
@@ -194,14 +200,6 @@ func (r *urlResponse) Close() error {
 // Cronet automatically decompresses body content if one of these encodings is used
 var cronetEncodings = []string{"br", "deflate", "gzip", "x-gzip", "zstd"}
 
-func stringInSlice(a string, list []string) bool {
-	for _, b := range list {
-		if b == a {
-			return true
-		}
-	}
-	return false
-}
 
 func (r *urlResponse) OnRedirectReceived(self URLRequestCallback, request URLRequest, info URLResponseInfo, newLocationUrl string) {
 	if r.FollowRedirect {
@@ -232,7 +230,7 @@ func (r *urlResponse) OnResponseStarted(self URLRequestCallback, request URLRequ
 		// Drop Content-Encoding header if body has been decompressed already
 		// and reset Content-Length to unknown after loop completes
 		if textproto.CanonicalMIMEHeaderKey(header.Name()) == "Content-Encoding" &&
-			stringInSlice(strings.ToLower(header.Value()), cronetEncodings) {
+			slices.Contains(cronetEncodings, strings.ToLower(header.Value())) {
 			resetContentLength = true
 			continue
 		}
@@ -312,11 +310,13 @@ func (p *bodyUploadProvider) Length(self UploadDataProvider) int64 {
 func (p *bodyUploadProvider) Read(self UploadDataProvider, sink UploadDataSink, buffer Buffer) {
 	n, err := p.body.Read(buffer.DataSlice())
 	if err != nil {
-		if p.contentLength == -1 && err == io.EOF {
-			sink.OnReadSucceeded(0, true)
-			return
-		} else if err == io.EOF {
-			sink.OnReadSucceeded(int64(n), false)
+		if err == io.EOF {
+			if p.contentLength == -1 {
+				// Case for chunked uploads
+				sink.OnReadSucceeded(0, true)
+			} else {
+				sink.OnReadSucceeded(int64(n), false)
+			}
 			return
 		}
 		sink.OnReadError(err.Error())
