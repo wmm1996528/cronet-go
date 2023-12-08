@@ -121,7 +121,7 @@ func (e Engine) RemoveRequestFinishedListener(listener URLRequestFinishedInfoLis
 
 // SetClientCertificate Configures all subsequent connections to server designated with {@code hostPortPair}
 // to authenticate with {@code client_cert_data} and {@code private_key_data} when requested.
-// {@code clientCertData} is supposed to be DER encoded.
+// {@code clientCertData} can be PEM/DER encoded.
 // {@code privateKeyData} is supposed to be PEM encoded.
 //
 // The method can be called only after the engine is started.
