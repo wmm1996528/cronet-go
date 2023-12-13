@@ -15,23 +15,29 @@ import (
 	"sync"
 )
 
-var executor Executor
+var asyncExecutor Executor
+var syncExecutor Executor
 
 func init() {
-	executor = NewExecutor(func(executor Executor, command Runnable) {
+	asyncExecutor = NewExecutor(func(executor Executor, command Runnable) {
 		go func() {
 			command.Run()
 			command.Destroy()
 		}()
 	})
-	runtime.SetFinalizer(&executor, (*Executor).Destroy)
+	syncExecutor = NewExecutor(func(executor Executor, command Runnable) {
+		command.Run()
+		command.Destroy()
+	})
+	runtime.SetFinalizer(&asyncExecutor, (*Executor).Destroy)
+	runtime.SetFinalizer(&syncExecutor, (*Executor).Destroy)
 }
 
 // RoundTripper is a wrapper from URLRequest to http.RoundTripper
 type RoundTripper struct {
 	FollowRedirect bool
 	Engine         Engine
-	closeEngine   bool
+	closeEngine    bool
 }
 
 func NewCronetTransport(params EngineParams, FollowRedirect bool) *RoundTripper {
@@ -62,12 +68,12 @@ func (t *RoundTripper) Close() error {
 			return errors.New("engine still has active requests, so couldn't shutdown")
 		}
 		t.Engine.Destroy()
+		t.closeEngine = false
 	}
 	return nil
 }
 
 func (t *RoundTripper) RoundTrip(request *http.Request) (*http.Response, error) {
-
 	requestParams := NewURLRequestParams()
 	if request.Method == "" {
 		requestParams.SetMethod("GET")
@@ -90,7 +96,7 @@ func (t *RoundTripper) RoundTrip(request *http.Request) (*http.Response, error) 
 	if request.Body != nil {
 		uploadProvider := NewUploadDataProvider(&bodyUploadProvider{request.Body, request.GetBody, request.ContentLength})
 		requestParams.SetUploadDataProvider(uploadProvider)
-		requestParams.SetUploadDataExecutor(executor)
+		requestParams.SetUploadDataExecutor(syncExecutor)
 	}
 	m := &sync.Mutex{}
 	responseHandler := urlResponse{
@@ -102,10 +108,10 @@ func (t *RoundTripper) RoundTrip(request *http.Request) (*http.Response, error) 
 			ProtoMinor: request.ProtoMinor,
 			Header:     make(http.Header),
 		},
-		complete: sync.NewCond(m),
-		read:     make(chan int),
-		cancel:   make(chan struct{}),
-		done:     make(chan struct{}),
+		readyToRead: sync.NewCond(m),
+		read:        make(chan int),
+		cancel:      make(chan struct{}),
+		done:        make(chan struct{}),
 	}
 	responseHandler.response.Body = &responseHandler
 	go responseHandler.monitorContext(request.Context())
@@ -113,21 +119,21 @@ func (t *RoundTripper) RoundTrip(request *http.Request) (*http.Response, error) 
 	callback := NewURLRequestCallback(&responseHandler)
 	urlRequest := NewURLRequest()
 	responseHandler.request = urlRequest
-	urlRequest.InitWithParams(t.Engine, request.URL.String(), requestParams, callback, executor)
+	urlRequest.InitWithParams(t.Engine, request.URL.String(), requestParams, callback, asyncExecutor)
 	requestParams.Destroy()
 	urlRequest.Start()
 	m.Lock()
-	responseHandler.complete.Wait()
+	responseHandler.readyToRead.Wait()
 	return &responseHandler.response, responseHandler.err
 }
 
 type urlResponse struct {
 	FollowRedirect bool
 
-	complete *sync.Cond
-	request  URLRequest
-	response http.Response
-	err      error
+	readyToRead *sync.Cond
+	request     URLRequest
+	response    http.Response
+	err         error
 
 	access     sync.Mutex
 	read       chan int
@@ -198,7 +204,6 @@ func (r *urlResponse) Close() error {
 // Cronet automatically decompresses body content if one of these encodings is used
 var cronetEncodings = []string{"br", "deflate", "gzip", "x-gzip", "zstd"}
 
-
 func (r *urlResponse) OnRedirectReceived(self URLRequestCallback, request URLRequest, info URLResponseInfo, newLocationUrl string) {
 	if r.FollowRedirect {
 		request.FollowRedirect()
@@ -214,7 +219,7 @@ func (r *urlResponse) OnRedirectReceived(self URLRequestCallback, request URLReq
 	}
 	r.response.Body = io.NopCloser(io.MultiReader())
 	request.Cancel()
-	r.complete.Signal()
+	r.readyToRead.Signal()
 }
 
 func (r *urlResponse) OnResponseStarted(self URLRequestCallback, request URLRequest, info URLResponseInfo) {
@@ -243,7 +248,7 @@ func (r *urlResponse) OnResponseStarted(self URLRequestCallback, request URLRequ
 	}
 	r.response.TransferEncoding = r.response.Header.Values("Content-Transfer-Encoding")
 	r.response.Close = true
-	r.complete.Signal()
+	r.readyToRead.Signal()
 }
 
 func (r *urlResponse) OnReadCompleted(self URLRequestCallback, request URLRequest, info URLResponseInfo, buffer Buffer, bytesRead int64) {
@@ -251,7 +256,7 @@ func (r *urlResponse) OnReadCompleted(self URLRequestCallback, request URLReques
 	defer r.access.Unlock()
 
 	if bytesRead == 0 {
-		r.close(request, io.EOF)
+		r.OnSucceeded(self, request, info)
 		return
 	}
 
@@ -291,7 +296,7 @@ func (r *urlResponse) close(request URLRequest, err error) {
 	}
 
 	close(r.done)
-	r.complete.Signal()
+	r.readyToRead.Signal()
 	request.Destroy()
 }
 
