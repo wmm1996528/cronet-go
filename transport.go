@@ -108,10 +108,10 @@ func (t *RoundTripper) RoundTrip(request *http.Request) (*http.Response, error) 
 			ProtoMinor: request.ProtoMinor,
 			Header:     make(http.Header),
 		},
-		readToRead: sync.NewCond(m),
-		read:       make(chan int),
-		cancel:     make(chan struct{}),
-		done:       make(chan struct{}),
+		readyToRead: sync.NewCond(m),
+		read:        make(chan int),
+		cancel:      make(chan struct{}),
+		done:        make(chan struct{}),
 	}
 	responseHandler.response.Body = &responseHandler
 	go responseHandler.monitorContext(request.Context())
@@ -123,17 +123,17 @@ func (t *RoundTripper) RoundTrip(request *http.Request) (*http.Response, error) 
 	requestParams.Destroy()
 	urlRequest.Start()
 	m.Lock()
-	responseHandler.readToRead.Wait()
+	responseHandler.readyToRead.Wait()
 	return &responseHandler.response, responseHandler.err
 }
 
 type urlResponse struct {
 	FollowRedirect bool
 
-	readToRead *sync.Cond
-	request    URLRequest
-	response   http.Response
-	err        error
+	readyToRead *sync.Cond
+	request     URLRequest
+	response    http.Response
+	err         error
 
 	access     sync.Mutex
 	read       chan int
@@ -219,7 +219,7 @@ func (r *urlResponse) OnRedirectReceived(self URLRequestCallback, request URLReq
 	}
 	r.response.Body = io.NopCloser(io.MultiReader())
 	request.Cancel()
-	r.readToRead.Signal()
+	r.readyToRead.Signal()
 }
 
 func (r *urlResponse) OnResponseStarted(self URLRequestCallback, request URLRequest, info URLResponseInfo) {
@@ -248,7 +248,7 @@ func (r *urlResponse) OnResponseStarted(self URLRequestCallback, request URLRequ
 	}
 	r.response.TransferEncoding = r.response.Header.Values("Content-Transfer-Encoding")
 	r.response.Close = true
-	r.readToRead.Signal()
+	r.readyToRead.Signal()
 }
 
 func (r *urlResponse) OnReadCompleted(self URLRequestCallback, request URLRequest, info URLResponseInfo, buffer Buffer, bytesRead int64) {
@@ -296,7 +296,7 @@ func (r *urlResponse) close(request URLRequest, err error) {
 	}
 
 	close(r.done)
-	r.readToRead.Signal()
+	r.readyToRead.Signal()
 	request.Destroy()
 }
 
