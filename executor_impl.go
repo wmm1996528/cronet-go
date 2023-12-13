@@ -11,6 +11,11 @@ import (
 	"unsafe"
 )
 
+var (
+	executorAccess sync.RWMutex
+	executors      = make(map[uintptr]ExecutorExecuteFunc)
+)
+
 func NewExecutor(executeFunc ExecutorExecuteFunc) Executor {
 	ptr := C.Cronet_Executor_CreateWith((*[0]byte)(C.cronetExecutorExecute))
 	executorAccess.Lock()
@@ -24,15 +29,6 @@ func (e Executor) Destroy() {
 	executorAccess.Lock()
 	delete(executors, uintptr(unsafe.Pointer(e.ptr)))
 	executorAccess.Unlock()
-}
-
-var (
-	executorAccess sync.RWMutex
-	executors      map[uintptr]ExecutorExecuteFunc
-)
-
-func init() {
-	executors = make(map[uintptr]ExecutorExecuteFunc)
 }
 
 //export cronetExecutorExecute

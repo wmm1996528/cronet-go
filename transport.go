@@ -15,14 +15,23 @@ import (
 	"sync"
 )
 
+var executor Executor
+
+func init() {
+	executor = NewExecutor(func(executor Executor, command Runnable) {
+		go func() {
+			command.Run()
+			command.Destroy()
+		}()
+	})
+	runtime.SetFinalizer(&executor, (*Executor).Destroy)
+}
+
 // RoundTripper is a wrapper from URLRequest to http.RoundTripper
 type RoundTripper struct {
 	FollowRedirect bool
 	Engine         Engine
-	Executor       Executor
-
 	closeEngine   bool
-	closeExecutor bool
 }
 
 func NewCronetTransport(params EngineParams, FollowRedirect bool) *RoundTripper {
@@ -33,14 +42,6 @@ func NewCronetTransport(params EngineParams, FollowRedirect bool) *RoundTripper 
 	t.Engine.StartWithParams(params)
 	params.Destroy()
 	t.closeEngine = true
-
-	t.Executor = NewExecutor(func(executor Executor, command Runnable) {
-		go func() {
-			command.Run()
-			command.Destroy()
-		}()
-	})
-	t.closeExecutor = true
 	runtime.SetFinalizer(t, (*RoundTripper).Close)
 	return t
 }
@@ -61,9 +62,6 @@ func (t *RoundTripper) Close() error {
 			return errors.New("engine still has active requests, so couldn't shutdown")
 		}
 		t.Engine.Destroy()
-	}
-	if t.closeExecutor {
-		t.Executor.Destroy()
 	}
 	return nil
 }
@@ -92,7 +90,7 @@ func (t *RoundTripper) RoundTrip(request *http.Request) (*http.Response, error) 
 	if request.Body != nil {
 		uploadProvider := NewUploadDataProvider(&bodyUploadProvider{request.Body, request.GetBody, request.ContentLength})
 		requestParams.SetUploadDataProvider(uploadProvider)
-		requestParams.SetUploadDataExecutor(t.Executor)
+		requestParams.SetUploadDataExecutor(executor)
 	}
 	m := &sync.Mutex{}
 	responseHandler := urlResponse{
@@ -115,7 +113,7 @@ func (t *RoundTripper) RoundTrip(request *http.Request) (*http.Response, error) 
 	callback := NewURLRequestCallback(&responseHandler)
 	urlRequest := NewURLRequest()
 	responseHandler.request = urlRequest
-	urlRequest.InitWithParams(t.Engine, request.URL.String(), requestParams, callback, t.Executor)
+	urlRequest.InitWithParams(t.Engine, request.URL.String(), requestParams, callback, executor)
 	requestParams.Destroy()
 	urlRequest.Start()
 	m.Lock()
