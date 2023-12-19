@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"io"
+	"log"
 	"net"
 	"net/http"
 	"net/textproto"
@@ -17,8 +18,11 @@ import (
 
 var asyncExecutor Executor
 var syncExecutor Executor
+var logger *log.Logger
 
 func init() {
+	logger = log.New(os.Stderr, "", 0)
+
 	asyncExecutor = NewExecutor(func(executor Executor, command Runnable) {
 		go func() {
 			command.Run()
@@ -213,6 +217,7 @@ func (r *urlResponse) OnRedirectReceived(self URLRequestCallback, request URLReq
 	r.response.Status = info.StatusText()
 	r.response.StatusCode = info.StatusCode()
 	headerLen := info.HeaderSize()
+	logger.Println("OnRedirectReceived : Adding headers via Add method and not Set!!")
 	for i := 0; i < headerLen; i++ {
 		header := info.HeaderAt(i)
 		r.response.Header.Add(header.Name(), header.Value())
@@ -228,6 +233,7 @@ func (r *urlResponse) OnResponseStarted(self URLRequestCallback, request URLRequ
 	headerLen := info.HeaderSize()
 
 	resetContentLength := false
+	logger.Println("OnResponseStarted : Adding headers via Add method and not Set!!")
 	for i := 0; i < headerLen; i++ {
 		header := info.HeaderAt(i)
 		// Drop Content-Encoding header if body has been decompressed already
