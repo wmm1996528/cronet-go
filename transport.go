@@ -215,7 +215,7 @@ func (r *urlResponse) OnRedirectReceived(self URLRequestCallback, request URLReq
 	headerLen := info.HeaderSize()
 	for i := 0; i < headerLen; i++ {
 		header := info.HeaderAt(i)
-		r.response.Header.Set(header.Name(), header.Value())
+		r.response.Header.Add(header.Name(), header.Value())
 	}
 	r.response.Body = io.NopCloser(io.MultiReader())
 	request.Cancel()
@@ -237,7 +237,7 @@ func (r *urlResponse) OnResponseStarted(self URLRequestCallback, request URLRequ
 			resetContentLength = true
 			continue
 		}
-		r.response.Header.Set(header.Name(), header.Value())
+		r.response.Header.Add(header.Name(), header.Value())
 	}
 	if resetContentLength {
 		r.response.Uncompressed = true
