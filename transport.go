@@ -86,7 +86,11 @@ func (t *RoundTripper) RoundTrip(request *http.Request) (*http.Response, error) 
 	}
 	for key, values := range request.Header {
 		for _, value := range values {
-			if len(value) == 0 {
+			validHeaderName := IsValidHeaderName(key)
+			validHeaderValue := IsValidHeaderValue(value)
+			if !validHeaderName || !validHeaderValue {
+				log.Println("Skipping this invalid header: ", "validHeaderName?", validHeaderName,
+					"validHeaderValue?", validHeaderValue, "key:", key, "value:", value)
 				continue
 			}
 			header := NewHTTPHeader()
@@ -123,9 +127,16 @@ func (t *RoundTripper) RoundTrip(request *http.Request) (*http.Response, error) 
 	callback := NewURLRequestCallback(&responseHandler)
 	urlRequest := NewURLRequest()
 	responseHandler.request = urlRequest
-	urlRequest.InitWithParams(t.Engine, request.URL.String(), requestParams, callback, asyncExecutor)
+	cronetResult := urlRequest.InitWithParams(t.Engine, request.URL.String(), requestParams, callback, asyncExecutor)
+	if cronetResult != ResultSuccess {
+		return nil, errors.New("CRONET_ERROR : failed to init request")
+	}
 	requestParams.Destroy()
-	urlRequest.Start()
+	cronetResult = urlRequest.Start()
+	if cronetResult != ResultSuccess {
+		urlRequest.Cancel()
+		return nil, errors.New("CRONET_ERROR : failed to start request")
+	}
 	m.Lock()
 	responseHandler.readyToRead.Wait()
 	return &responseHandler.response, responseHandler.err
@@ -217,7 +228,6 @@ func (r *urlResponse) OnRedirectReceived(self URLRequestCallback, request URLReq
 	r.response.Status = info.StatusText()
 	r.response.StatusCode = info.StatusCode()
 	headerLen := info.HeaderSize()
-	logger.Println("OnRedirectReceived : Adding headers via Add method and not Set!!")
 	for i := 0; i < headerLen; i++ {
 		header := info.HeaderAt(i)
 		r.response.Header.Add(header.Name(), header.Value())
@@ -233,7 +243,6 @@ func (r *urlResponse) OnResponseStarted(self URLRequestCallback, request URLRequ
 	headerLen := info.HeaderSize()
 
 	resetContentLength := false
-	logger.Println("OnResponseStarted : Adding headers via Add method and not Set!!")
 	for i := 0; i < headerLen; i++ {
 		header := info.HeaderAt(i)
 		// Drop Content-Encoding header if body has been decompressed already
