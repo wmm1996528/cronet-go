@@ -86,13 +86,6 @@ func (t *RoundTripper) RoundTrip(request *http.Request) (*http.Response, error) 
 	}
 	for key, values := range request.Header {
 		for _, value := range values {
-			validHeaderName := IsValidHeaderName(key)
-			validHeaderValue := IsValidHeaderValue(value)
-			if !validHeaderName || !validHeaderValue {
-				log.Println("Skipping this invalid header: ", "validHeaderName?", validHeaderName,
-					"validHeaderValue?", validHeaderValue, "key:", key, "value:", value)
-				continue
-			}
 			header := NewHTTPHeader()
 			header.SetName(key)
 			header.SetValue(value)
@@ -188,8 +181,11 @@ func (r *urlResponse) Read(p []byte) (n int, err error) {
 
 	r.readBuffer = NewBuffer()
 	r.readBuffer.InitWithDataAndCallback(p, NewBufferCallback(nil))
-	r.request.Read(r.readBuffer)
+	cronetResult := r.request.Read(r.readBuffer)
 	r.access.Unlock()
+	if cronetResult != ResultSuccess {
+		return 0, errors.New("CRONET_ERROR : failed to read body")
+	}
 
 	select {
 	case bytesRead := <-r.read:
