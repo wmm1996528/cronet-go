@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"io"
-	"log"
 	"net"
 	"net/http"
 	"net/textproto"
@@ -18,11 +17,8 @@ import (
 
 var asyncExecutor Executor
 var syncExecutor Executor
-var logger *log.Logger
 
 func init() {
-	logger = log.New(os.Stderr, "", 0)
-
 	asyncExecutor = NewExecutor(func(executor Executor, command Runnable) {
 		go func() {
 			command.Run()
@@ -122,13 +118,12 @@ func (t *RoundTripper) RoundTrip(request *http.Request) (*http.Response, error) 
 	responseHandler.request = urlRequest
 	cronetResult := urlRequest.InitWithParams(t.Engine, request.URL.String(), requestParams, callback, asyncExecutor)
 	if cronetResult != ResultSuccess {
-		return nil, errors.New("CRONET_ERROR : failed to init request")
+		return nil, errors.New("failed to init request, cronet_result_code : " + strconv.Itoa(int(cronetResult)))
 	}
 	requestParams.Destroy()
 	cronetResult = urlRequest.Start()
 	if cronetResult != ResultSuccess {
-		urlRequest.Cancel()
-		return nil, errors.New("CRONET_ERROR : failed to start request")
+		return nil, errors.New("failed to start request, cronet_result_code : " + strconv.Itoa(int(cronetResult)))
 	}
 	m.Lock()
 	responseHandler.readyToRead.Wait()
@@ -184,7 +179,7 @@ func (r *urlResponse) Read(p []byte) (n int, err error) {
 	cronetResult := r.request.Read(r.readBuffer)
 	r.access.Unlock()
 	if cronetResult != ResultSuccess {
-		return 0, errors.New("CRONET_ERROR : failed to read body")
+		return 0, errors.New("failed to read body, cronet_result_code : " + strconv.Itoa(int(cronetResult)))
 	}
 
 	select {
