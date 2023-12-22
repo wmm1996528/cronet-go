@@ -82,9 +82,6 @@ func (t *RoundTripper) RoundTrip(request *http.Request) (*http.Response, error) 
 	}
 	for key, values := range request.Header {
 		for _, value := range values {
-			if len(value) == 0 {
-				continue
-			}
 			header := NewHTTPHeader()
 			header.SetName(key)
 			header.SetValue(value)
@@ -119,9 +116,15 @@ func (t *RoundTripper) RoundTrip(request *http.Request) (*http.Response, error) 
 	callback := NewURLRequestCallback(&responseHandler)
 	urlRequest := NewURLRequest()
 	responseHandler.request = urlRequest
-	urlRequest.InitWithParams(t.Engine, request.URL.String(), requestParams, callback, asyncExecutor)
+	cronetResult := urlRequest.InitWithParams(t.Engine, request.URL.String(), requestParams, callback, asyncExecutor)
+	if cronetResult != ResultSuccess {
+		return nil, errors.New("failed to init request, cronet_result_code : " + strconv.Itoa(int(cronetResult)))
+	}
 	requestParams.Destroy()
-	urlRequest.Start()
+	cronetResult = urlRequest.Start()
+	if cronetResult != ResultSuccess {
+		return nil, errors.New("failed to start request, cronet_result_code : " + strconv.Itoa(int(cronetResult)))
+	}
 	m.Lock()
 	responseHandler.readyToRead.Wait()
 	return &responseHandler.response, responseHandler.err
@@ -173,8 +176,11 @@ func (r *urlResponse) Read(p []byte) (n int, err error) {
 
 	r.readBuffer = NewBuffer()
 	r.readBuffer.InitWithDataAndCallback(p, NewBufferCallback(nil))
-	r.request.Read(r.readBuffer)
+	cronetResult := r.request.Read(r.readBuffer)
 	r.access.Unlock()
+	if cronetResult != ResultSuccess {
+		return 0, errors.New("failed to read body, cronet_result_code : " + strconv.Itoa(int(cronetResult)))
+	}
 
 	select {
 	case bytesRead := <-r.read:
