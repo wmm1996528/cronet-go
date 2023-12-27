@@ -82,6 +82,9 @@ func (t *RoundTripper) RoundTrip(request *http.Request) (*http.Response, error) 
 	}
 	for key, values := range request.Header {
 		for _, value := range values {
+			if len(value) == 0 {
+				continue
+			}
 			header := NewHTTPHeader()
 			header.SetName(key)
 			header.SetValue(value)
