@@ -1,7 +1,7 @@
 #!/bin/bash -e
 
-export set CGO_CFLAGS="-I/usr/local/include/cronet"
-export set CGO_LDFLAGS="-Wl,-rpath,/usr/local/lib/cronet -L/usr/local/lib/cronet -lcronet"
+export set CGO_CFLAGS="-I/Users/wang/Desktop/cronet-binaries/src/out/Release/cronet"
+export set CGO_LDFLAGS="-Wl,-rpath,/Users/wang/Desktop/cronet-binaries/src/out/Release/cronet -L/Users/wang/Desktop/cronet-binaries/src/out/Release/cronet -lcronet"
 
 go build -o ./example1 ./1
 go build -o ./example2 ./2

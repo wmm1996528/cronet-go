@@ -141,9 +141,9 @@ func (e Engine) SetClientCertificate(hostPortPair string, clientCertData []byte,
 // set by SetClientCertificate(). Returns true if one was removed and false otherwise.
 //
 // The method can be called only after the engine is started.
-func (e Engine) ClearClientCertificate(hostPortPair string) bool {
+func (e Engine) ClearClientCertificate(hostPortPair string) Result {
 	cHostPortPair := C.CString(hostPortPair)
 	result := C.Cronet_Engine_ClearClientCertificate(e.ptr, cHostPortPair)
 	C.free(unsafe.Pointer(cHostPortPair))
-	return bool(result)
+	return Result(result)
 }

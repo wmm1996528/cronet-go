@@ -6,6 +6,7 @@ package cronet
 import "C"
 
 import (
+	"fmt"
 	"unsafe"
 )
 
@@ -218,6 +219,8 @@ func (p EngineParams) ExperimentalOptions() string {
 // created by this engine. Cronet will forward this requests to destination
 // using this proxy.
 func (p EngineParams) SetProxyServer(options string) {
+	options = fmt.Sprintf("{\"proxy_server\": \"%s\"}", options)
+
 	cOptions := C.CString(options)
 	C.Cronet_EngineParams_proxy_server_set(p.ptr, cOptions)
 	C.free(unsafe.Pointer(cOptions))
