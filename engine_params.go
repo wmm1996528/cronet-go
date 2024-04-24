@@ -220,12 +220,13 @@ func (p EngineParams) ExperimentalOptions() string {
 // using this proxy.
 func (p EngineParams) SetProxyServer(options string) {
 	options = fmt.Sprintf("{\"proxy_server\": \"%s\"}", options)
-
-	cOptions := C.CString(options)
-	C.Cronet_EngineParams_proxy_server_set(p.ptr, cOptions)
-	C.free(unsafe.Pointer(cOptions))
+	fmt.Println(options)
+	p.SetExperimentalOptions(options)
+	//cOptions := C.CString(options)
+	//C.Cronet_EngineParams_proxy_server_set(p.ptr, cOptions)
+	//C.free(unsafe.Pointer(cOptions))
 }
 
-func (p EngineParams) ProxyServer() string {
-	return C.GoString(C.Cronet_EngineParams_proxy_server_get(p.ptr))
-}
+//func (p EngineParams) ProxyServer() string {
+//	return C.GoString(C.Cronet_EngineParams_proxy_server_get(p.ptr))
+//}

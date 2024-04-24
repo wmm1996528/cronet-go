@@ -125,25 +125,25 @@ func (e Engine) RemoveRequestFinishedListener(listener URLRequestFinishedInfoLis
 // {@code privateKeyData} is supposed to be PEM encoded.
 //
 // The method can be called only after the engine is started.
-func (e Engine) SetClientCertificate(hostPortPair string, clientCertData []byte, privateKeyData []byte) {
-	cHostPortPair := C.CString(hostPortPair)
-	clientCertBuffer := NewBuffer()
-	clientCertBuffer.InitWithDataAndCallback(clientCertData, NewBufferCallback(nil))
-	privateKeyBuffer := NewBuffer()
-	privateKeyBuffer.InitWithDataAndCallback(privateKeyData, NewBufferCallback(nil))
-	C.Cronet_Engine_SetClientCertificate(e.ptr, cHostPortPair, clientCertBuffer.ptr, privateKeyBuffer.ptr)
-	clientCertBuffer.Destroy()
-	privateKeyBuffer.Destroy()
-	C.free(unsafe.Pointer(cHostPortPair))
-}
+//func (e Engine) SetClientCertificate(hostPortPair string, clientCertData []byte, privateKeyData []byte) {
+//	cHostPortPair := C.CString(hostPortPair)
+//	clientCertBuffer := NewBuffer()
+//	clientCertBuffer.InitWithDataAndCallback(clientCertData, NewBufferCallback(nil))
+//	privateKeyBuffer := NewBuffer()
+//	privateKeyBuffer.InitWithDataAndCallback(privateKeyData, NewBufferCallback(nil))
+//	C.Cronet_Engine_SetClientCertificate(e.ptr, cHostPortPair, clientCertBuffer.ptr, privateKeyBuffer.ptr)
+//	clientCertBuffer.Destroy()
+//	privateKeyBuffer.Destroy()
+//	C.free(unsafe.Pointer(cHostPortPair))
+//}
 
 // ClearClientCertificate Clears a client certificate preference for server designated with {@code hostPortPair}
 // set by SetClientCertificate(). Returns true if one was removed and false otherwise.
 //
 // The method can be called only after the engine is started.
-func (e Engine) ClearClientCertificate(hostPortPair string) Result {
-	cHostPortPair := C.CString(hostPortPair)
-	result := C.Cronet_Engine_ClearClientCertificate(e.ptr, cHostPortPair)
-	C.free(unsafe.Pointer(cHostPortPair))
-	return Result(result)
-}
+//func (e Engine) ClearClientCertificate(hostPortPair string) Result {
+//	cHostPortPair := C.CString(hostPortPair)
+//	result := C.Cronet_Engine_ClearClientCertificate(e.ptr, cHostPortPair)
+//	C.free(unsafe.Pointer(cHostPortPair))
+//	return Result(result)
+//}
