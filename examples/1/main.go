@@ -28,27 +28,28 @@ func (u *URL) MarshalText() ([]byte, error) {
 	return []byte(u.String()), nil
 }
 
-func ConfigureClientCertificate(e *cronet.Engine, certPath string, keyPath string, hostPort []string) {
-	if certPath == "" || keyPath == "" {
-		return
-	}
-	clientCertData, err := os.ReadFile(certPath)
-	if err != nil {
-		log.Fatal(err)
-	}
-	privateKeyData, err := os.ReadFile(keyPath)
-	if err != nil {
-		log.Fatal(err)
-	}
-	for _, hostPortPair := range hostPort {
-		e.SetClientCertificate(hostPortPair, clientCertData, privateKeyData)
-	}
-}
+//func ConfigureClientCertificate(e *cronet.Engine, certPath string, keyPath string, hostPort []string) {
+//	if certPath == "" || keyPath == "" {
+//		return
+//	}
+//	clientCertData, err := os.ReadFile(certPath)
+//	if err != nil {
+//		log.Fatal(err)
+//	}
+//	privateKeyData, err := os.ReadFile(keyPath)
+//	if err != nil {
+//		log.Fatal(err)
+//	}
+//	for _, hostPortPair := range hostPort {
+//		e.SetClientCertificate(hostPortPair, clientCertData, privateKeyData)
+//	}
+//}
 
 func main() {
 
 	engineParams := cronet.NewEngineParams()
-	engineParams.SetProxyServer("http://127.0.0.1:7890")
+	//engineParams.SetProxyServer("http://127.0.0.1:7890")
+	engineParams.SetProxyServer("http://user-uni003-region-de-sessid-2246-sesstime-5-keep-true:q39CEBTs5A5YQXor@pr.roxlabs.cn:4600")
 	engineParams.SetEnableHTTP2(true)
 	engineParams.SetEnableQuic(false)
 	engineParams.SetEnableBrotli(true)
