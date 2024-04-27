@@ -48,8 +48,8 @@ func (u *URL) MarshalText() ([]byte, error) {
 func main() {
 
 	engineParams := cronet.NewEngineParams()
-	//engineParams.SetProxyServer("http://127.0.0.1:7890")
-	engineParams.SetProxyServer("http://user-uni003-region-de-sessid-2246-sesstime-5-keep-true:q39CEBTs5A5YQXor@pr.roxlabs.cn:4600")
+	engineParams.SetProxyServer("http://127.0.0.1:8890")
+	//engineParams.SetProxyServer("http://user-uni003-region-de-sessid-2246-sesstime-5-keep-true:q39CEBTs5A5YQXor@pr.roxlabs.cn:4600")
 	engineParams.SetEnableHTTP2(true)
 	engineParams.SetEnableQuic(false)
 	engineParams.SetEnableBrotli(true)
@@ -97,23 +97,22 @@ func main() {
 		Jar: jar,
 	}
 	//data := "{\"isFlightChange\":false,\"flightList\":[{\"departureStation\":\"BOJ\",\"arrivalStation\":\"VIE\",\"departureDate\":\"2024-07-21\"}],\"adultCount\":1,\"childCount\":0,\"infantCount\":0,\"wdc\":true}"
-	req, _ := http.NewRequest("GET", "https://www.vueling.com/de", nil)
+	req, _ := http.NewRequest("GET", "https://m.vueling.com", nil)
 	//req, _ := http.NewRequest("GET", "https://www.jetstar.com/au/en/booking/search-flights?s=true&adults=1&children=0&infants=0&selectedclass1=economy&currency=AUD&mon=true&channel=DESKTOP&origin1=ADL&destination1=BNE&departuredate1=2024-03-13", nil)
 	headers := map[string]string{
-		"authority":                 "www.vueling.com",
 		"accept":                    "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
 		"accept-language":           "en",
 		"cache-control":             "no-cache",
 		"pragma":                    "no-cache",
-		"sec-ch-ua":                 "\"Not_A Brand\";v=\"8\", \"Chromium\";v=\"120\", \"Google Chrome\";v=\"120\"",
-		"sec-ch-ua-mobile":          "?0",
-		"sec-ch-ua-platform":        "\"macOS\"",
+		"sec-ch-ua":                 "\"Google Chrome\";v=\"123\", \"Not:A-Brand\";v=\"8\", \"Chromium\";v=\"123\"",
+		"sec-ch-ua-mobile":          "?1",
+		"sec-ch-ua-platform":        "\"Android\"",
 		"sec-fetch-dest":            "document",
 		"sec-fetch-mode":            "navigate",
 		"sec-fetch-site":            "none",
 		"sec-fetch-user":            "?1",
 		"upgrade-insecure-requests": "1",
-		"user-agent":                "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+		"user-agent":                "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Mobile Safari/537.36",
 	}
 	for k, v := range headers {
 		req.Header.Set(k, v)
