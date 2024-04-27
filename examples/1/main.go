@@ -8,6 +8,7 @@ import (
 	"net/http/cookiejar"
 	"net/url"
 	"os"
+	"strings"
 )
 
 // URL wraps the net/url.URL type to enable unmarshalling from text
@@ -48,8 +49,8 @@ func (u *URL) MarshalText() ([]byte, error) {
 func main() {
 
 	engineParams := cronet.NewEngineParams()
-	engineParams.SetProxyServer("http://127.0.0.1:8890")
-	//engineParams.SetProxyServer("http://user-uni003-region-de-sessid-2246-sesstime-5-keep-true:q39CEBTs5A5YQXor@pr.roxlabs.cn:4600")
+	//engineParams.SetProxyServer("http://127.0.0.1:8890")
+	engineParams.SetProxyServer("http://unfflcc:76cc14-47b8dd-1f8ace-827836-0c740e@usa.rotating.proxyrack.net:10000")
 	engineParams.SetEnableHTTP2(true)
 	engineParams.SetEnableQuic(false)
 	engineParams.SetEnableBrotli(true)
@@ -97,22 +98,27 @@ func main() {
 		Jar: jar,
 	}
 	//data := "{\"isFlightChange\":false,\"flightList\":[{\"departureStation\":\"BOJ\",\"arrivalStation\":\"VIE\",\"departureDate\":\"2024-07-21\"}],\"adultCount\":1,\"childCount\":0,\"infantCount\":0,\"wdc\":true}"
-	req, _ := http.NewRequest("GET", "https://m.vueling.com", nil)
+	//req, _ := http.NewRequest("GET", "https://m.vueling.com", nil)
+	data := "{\"DeviceType\":\"WEB\",\"UserAgent\":\"Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Mobile Safari/537.36\",\"Udid\":\"2355-6b05-cc33-6e6f-75f5-5682\",\"IP\":\"235.231.34.152\",\"AppVersion\":\"17.32.0\",\"Domain\":\"https://m.vueling.com\",\"DiscountType\":0,\"Paxs\":[{\"PaxType\":\"ADT\",\"Quantity\":\"1\"},{\"PaxType\":\"CHD\",\"Quantity\":\"0\"},{\"PaxType\":\"INF\",\"Quantity\":\"0\"}],\"CurrencyCode\":\"EUR\",\"AirportDateTimeList\":[{\"ArrivalStation\":\"BCN\",\"DepartureStation\":\"LCG\",\"MarketDateDeparture\":\"2024-04-28\"}],\"Language\":\"en-GB\"}"
+	req, _ := http.NewRequest("POST", "https://apimobile.vueling.com/Vueling.Mobile.AvailabilityService.WebAPI/api/V2/AvailabilityController/DoAirPriceSB", strings.NewReader(data))
 	//req, _ := http.NewRequest("GET", "https://www.jetstar.com/au/en/booking/search-flights?s=true&adults=1&children=0&infants=0&selectedclass1=economy&currency=AUD&mon=true&channel=DESKTOP&origin1=ADL&destination1=BNE&departuredate1=2024-03-13", nil)
 	headers := map[string]string{
-		"accept":                    "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
-		"accept-language":           "en",
-		"cache-control":             "no-cache",
-		"pragma":                    "no-cache",
-		"sec-ch-ua":                 "\"Google Chrome\";v=\"123\", \"Not:A-Brand\";v=\"8\", \"Chromium\";v=\"123\"",
-		"sec-ch-ua-mobile":          "?1",
-		"sec-ch-ua-platform":        "\"Android\"",
-		"sec-fetch-dest":            "document",
-		"sec-fetch-mode":            "navigate",
-		"sec-fetch-site":            "none",
-		"sec-fetch-user":            "?1",
-		"upgrade-insecure-requests": "1",
-		"user-agent":                "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Mobile Safari/537.36",
+		"Accept":             "application/json, text/plain, */*",
+		"Accept-Language":    "en",
+		"Cache-Control":      "no-cache",
+		"Connection":         "keep-alive",
+		"Content-Type":       "application/json",
+		"Origin":             "https://m.vueling.com",
+		"Pragma":             "no-cache",
+		"Referer":            "https://m.vueling.com/",
+		"Sec-Fetch-Dest":     "empty",
+		"Sec-Fetch-Mode":     "cors",
+		"Sec-Fetch-Site":     "same-site",
+		"User-Agent":         "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Mobile Safari/537.36",
+		"sec-ch-ua":          "\"Google Chrome\";v=\"123\", \"Not:A-Brand\";v=\"8\", \"Chromium\";v=\"123\"",
+		"sec-ch-ua-mobile":   "?1",
+		"sec-ch-ua-platform": "\"Android\"",
+		"cookie":             "AKA_A2=A; _abck=7D3BA689C6CEAE51915D3CB4935672AE~-1~YAAQ3bEPF3NCuOeOAQAAFYJ/IAvx3lbZcwK7c/IUCl8j55np0nDFUcU2i8AkJD9on5I3R8L9dh86gWx2yHO/APKf6xiAejGXKbZ1H16SHjb+r4igG+mBXkGJGnD0W4CJLl24a3B6YjKFCMfILdCFpSinBpL37++0bhWUq1QsXXYUh1jlQFbFm7cngQ9FI7fsjYyc0KwDSgMVGJY6mf28bT5K5bukbFClIQK/Zf1p/yzmagpYNV6JHp3XhU/q6Iyw3VJCYb55YOx4SCvGgnuBOjeuIBYO9p9WBDELxnlWk6ZWbspPbvx3sYLkvX+yyASuma0ywDkyJtboYUkmRaL3qBN5RJXmyHVfqYmqQqy+tKN1GEVjbCcqhvO2CCIbcBNHeWSAplg4A5d45s4ZUsZvxC7aIKMtTf1xrw==~-1~-1~-1; ak_bmsc=CDFCA1724D670A1B199ADD9AFD17F51F~000000000000000000000000000000~YAAQ3bEPF3RCuOeOAQAAFYJ/IBfrRWXTxHEiF09i7g/2AAQOCcfg71Xrnk9gsMi42Jcwx8LfRKMtWgBmJgIX+7dOwUWPvahuAg29PA+sEVOntNveXEP1RCpsp9P5EtpL3hCECW/3V98kAOlP+3gFj1PSsvIOLWsljAkzK0bwaLaZsgxpWdo+ar6iy8bymkE9unjZ9WCTwB7xgdiqw7zNw+sWnFCwiExquGlZ3ar8eqENQTxJud6KhLfXJ+yP3lW0sjImTRNQ1JZfBMN8fpXxNU7xWtyqwZ59TMSb2oVLfIH5uTLeqcW2xZ4r8t71VSaE2lQPFcoXEZjOtdns8Wi3DICnRNfh0mhkrHYLS7r1RFRIVXuiiUH3CSbQiuSMBBGnDSgi7a9nAkBh/F/k; bm_s=YAAQsHsTApwsYg2PAQAA4Fd/IAG7kqHf6LZuU9MO/CncpcmF2CVXf+eZg1/xuNJ6PBOB6lfSUmyFBbBCnLHgfqzDunbqk4zw5v3adqa2YO3siIvOHVVT8lFPDMQJAzUUe7r0pSN48jyz8K/ZC9463OwH5tfYr41uDLdbb2yFNhJ43EZ+wz9KqsbIuWOGd+6hOQrjhUsdkPatLUSVGOR8HJF2GNgzmscAjkBptpR/wzGCDgOpYPhEvgaZ4aVkP+2VQEn9FIdRc8KlaLgxU0QjuDegxhmRexVyA1b9XecyDRq1OIZUgoJQMFe+UaPr0Qj0IKyrH4+8DRIdadRvUzLHrY/0b6zEoA==; bm_ss=ab8e18ef4e; bm_sz=13C347A6666DA6FDA8F938DC6053BC27~YAAQsHsTAmctYg2PAQAALW5/IBcV/yuPmkCrhWuBNgFsMQ8zwQoG5AUCR8qAGI6e6oBfCnenW5ZVFxXcf8G9ZL39/ILs1Len+SI1HS/z0OEBT5IcoImqXw7WLwOmk/Kd2Nen1dZ5xDMKGBI/6HnLHV2I1AdC2BfdYEn464o13tp1VzOlCQVhcTB4ygWOxO5bU7LiHHmTPn/GOlaBhZbcCSpaYoie7asNnMRAYklnJbwgx1v3bvpzfMrX6yv/H708myv8vHYBkbmKVxkuPw4uUKj3FKBOkoYeRozsIQGtOoXhyjvfxuRTEOmKo/Vhem67j39Qbe117lOLP1sMTFHrh+H1L6caGxYPAxEeXb6BupWSEmT3DqNG+wGLVgbRmX1jXcXdljKHMy6BEEO8I0b0GIxJ+ao=~4277313~4605497",
 	}
 	for k, v := range headers {
 		req.Header.Set(k, v)
