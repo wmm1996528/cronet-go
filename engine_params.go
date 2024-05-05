@@ -6,7 +6,9 @@ package cronet
 import "C"
 
 import (
+	"encoding/base64"
 	"fmt"
+	"net/url"
 	"unsafe"
 )
 
@@ -211,6 +213,19 @@ func (p EngineParams) SetExperimentalOptions(options string) {
 	C.free(unsafe.Pointer(cOptions))
 }
 
+// SetProxyUsername set JSON formatted experimental options to be used in Cronet Engine.
+func (p EngineParams) SetProxyUsername(options string) {
+	cOptions := C.CString(options)
+	C.Cronet_EngineParams_proxy_username_set(p.ptr, cOptions)
+	C.free(unsafe.Pointer(cOptions))
+}
+
+// SetExperimentalOptions set JSON formatted experimental options to be used in Cronet Engine.
+func (p EngineParams) SetProxyPassword(options string) {
+	cOptions := C.CString(options)
+	C.Cronet_EngineParams_proxy_password_set(p.ptr, cOptions)
+	C.free(unsafe.Pointer(cOptions))
+}
 func (p EngineParams) ExperimentalOptions() string {
 	return C.GoString(C.Cronet_EngineParams_experimental_options_get(p.ptr))
 }
@@ -219,12 +234,19 @@ func (p EngineParams) ExperimentalOptions() string {
 // created by this engine. Cronet will forward this requests to destination
 // using this proxy.
 func (p EngineParams) SetProxyServer(options string) {
-	options = fmt.Sprintf("{\"proxy_server\": \"%s\"}", options)
-	fmt.Println(options)
-	p.SetExperimentalOptions(options)
-	//cOptions := C.CString(options)
-	//C.Cronet_EngineParams_proxy_server_set(p.ptr, cOptions)
-	//C.free(unsafe.Pointer(cOptions))
+	//options = fmt.Sprintf("{\"proxy_server\": \"%s\"}", options)
+	ui, _ := url.Parse(options)
+	//fmt.Println(options)
+	//p.SetExperimentalOptions(options)
+	fmt.Println(fmt.Sprintf("%s://%s:%s", ui.Scheme, ui.Hostname(), ui.Port()))
+	pwd, _ := ui.User.Password()
+	auth := base64.StdEncoding.EncodeToString([]byte(fmt.Sprintf("%s:%s", ui.User.Username(), pwd)))
+	fmt.Println(auth)
+	p.SetUserAgent("Basic " + auth)
+	cOptions := C.CString(fmt.Sprintf("%s://%s:%s", ui.Scheme, ui.Hostname(), ui.Port()))
+	C.Cronet_EngineParams_proxy_rules_set(p.ptr, cOptions)
+
+	C.free(unsafe.Pointer(cOptions))
 }
 
 //func (p EngineParams) ProxyServer() string {

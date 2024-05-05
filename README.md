@@ -35,8 +35,8 @@ cp out/Cronet/cronet/include/* /usr/local/include/cronet
 cp out/Cronet/*.dylib /usr/local/lib/cronet
 
 CRONET_VERSION=$(build/util/version.py -f out/Cronet/cronet/VERSION -t "@MAJOR@.@MINOR@.@BUILD@.@PATCH@") \
-&& ln -sf /usr/local/lib/cronet/libcronet.${CRONET_VERSION}.dylib /usr/local/lib/cronet/libcronet.dylib \
-&& ln -sf /usr/local/lib/cronet/libcronet.${CRONET_VERSION}.dylib /usr/local/lib/libcronet.dylib \
+&& ln -sf /usr/local/lib/cronet/libcronet.${CRONET_VERSION}.dylib /usr/local/lib/cronet/libcronet.124.0.6344.0.dylib \
+&& ln -sf /usr/local/lib/cronet/libcronet.${CRONET_VERSION}.dylib /usr/local/lib/libcronet.124.0.6344.0.dylib \
 && ln -sf /usr/local/lib/cronet/libcronet.${CRONET_VERSION}.dylib /usr/local/lib/libcronet.${CRONET_VERSION}.dylib
 ```
 

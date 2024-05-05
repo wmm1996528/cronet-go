@@ -1,7 +1,7 @@
 package main
 
 import (
-	"flag"
+	"fmt"
 	"github.com/weblifeio/cronet-go"
 	"io"
 	"log"
@@ -10,20 +10,16 @@ import (
 )
 
 func main() {
-	var url string
-	flag.StringVar(&url, "url", "", "HTTP/2 URL to open")
-	var proxy string
-	flag.StringVar(&proxy, "proxy", "", "proxy server to use")
-	flag.Parse()
-	if len(url) == 0 {
-		log.Fatal("URL argument is not provided")
-	}
-
+	proxy := "http://us.ipwo.net:7878"
+	proxy = "https://127.0.0.1:8081"
+	url := "https://httpbin.org/ip"
 	// Allocate resources
 	engineParams := cronet.NewEngineParams()
 	engineParams.SetUserAgent("Go-http-client/2")
 	engineParams.SetProxyServer(proxy)
-
+	engineParams.SetEnableQuic(false)
+	engineParams.SetEnableHTTP2(true)
+	engineParams.SetEnableBrotli(true)
 	// Start Cronet engine
 	engine := cronet.NewEngine()
 	engine.StartWithParams(engineParams)
@@ -42,7 +38,12 @@ func main() {
 	streamEngine := engine.StreamEngine()
 
 	// Open HTTP2 URL
-	headers := make(map[string]string)
+	headers := map[string]string{}
+	headers["Proxy-Authorization"] = "Basic realm=dW5pMDAwMDJfY3VzdG9tX3pvbmVfREVfc2lkXzg1NjY2ODgzX3RpbWVfNTpGZGtpR0h0eTlh"
+	headers["proxy-authorization"] = "Basic realm=dW5pMDAwMDJfY3VzdG9tX3pvbmVfREVfc2lkXzg1NjY2ODgzX3RpbWVfNTpGZGtpR0h0eTlh"
+	headers["proxy-authenticate"] = "Basic realm=dW5pMDAwMDJfY3VzdG9tX3pvbmVfREVfc2lkXzg1NjY2ODgzX3RpbWVfNTpGZGtpR0h0eTlh"
+	fmt.Println(headers)
+	fmt.Println(url)
 	conn := streamEngine.CreateConn(true, true)
 	err := conn.Start(http.MethodGet, url, headers, 0, true)
 	if err != nil {

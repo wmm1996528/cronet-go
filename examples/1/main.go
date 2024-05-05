@@ -49,12 +49,14 @@ func (u *URL) MarshalText() ([]byte, error) {
 func main() {
 
 	engineParams := cronet.NewEngineParams()
-	//engineParams.SetProxyServer("http://127.0.0.1:8890")
-	engineParams.SetProxyServer("http://user-uni003-region-de-sessid-1125-sesstime-5-keep-true:q39CEBTs5A5YQXor@pr.roxlabs.cn:4600")
+	//engineParams.SetProxyServer("http://127.0.0.1:8081")
+	//engineParams.SetProxyServer("http://user-uni003-region-de-sessid-1125-sesstime-5-keep-true:q39CEBTs5A5YQXor@pr.roxlabs.cn:4600")
+	engineParams.SetProxyServer("http://user-uni003-region-us-sessid-1232-sesstime-5-keep-true:q39CEBTs5A5YQXor@pr.roxlabs.cn:4600")
 	engineParams.SetEnableHTTP2(true)
 	engineParams.SetEnableQuic(false)
 	engineParams.SetEnableBrotli(true)
 	t := cronet.NewCronetTransport(engineParams, true)
+	t.Engine.StartNetLogToFile("./1.log", true)
 	//ConfigureClientCertificate(&t.Engine, certPath, keyPath, []string{urlArg.Host, proxyArg.Host})
 	jar, _ := cookiejar.New(nil)
 	//u, err := url.Parse("https://be.wizzair.com")
@@ -100,8 +102,8 @@ func main() {
 	//data := "{\"isFlightChange\":false,\"flightList\":[{\"departureStation\":\"BOJ\",\"arrivalStation\":\"VIE\",\"departureDate\":\"2024-07-21\"}],\"adultCount\":1,\"childCount\":0,\"infantCount\":0,\"wdc\":true}"
 	//req, _ := http.NewRequest("GET", "https://m.vueling.com", nil)
 	data := "{\"DeviceType\":\"WEB\",\"UserAgent\":\"Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Mobile Safari/537.36\",\"Udid\":\"2355-6b05-cc33-6e6f-75f5-5682\",\"IP\":\"235.231.34.152\",\"AppVersion\":\"17.32.0\",\"Domain\":\"https://m.vueling.com\",\"DiscountType\":0,\"Paxs\":[{\"PaxType\":\"ADT\",\"Quantity\":\"1\"},{\"PaxType\":\"CHD\",\"Quantity\":\"0\"},{\"PaxType\":\"INF\",\"Quantity\":\"0\"}],\"CurrencyCode\":\"EUR\",\"AirportDateTimeList\":[{\"ArrivalStation\":\"BCN\",\"DepartureStation\":\"LCG\",\"MarketDateDeparture\":\"2024-04-28\"}],\"Language\":\"en-GB\"}"
-	//req, _ := http.NewRequest("POST", "https://apimobile.vueling.com/Vueling.Mobile.AvailabilityService.WebAPI/api/V2/AvailabilityController/DoAirPriceSB", strings.NewReader(data))
-	req, _ := http.NewRequest("POST", "http://httpbin.org/ip", strings.NewReader(data))
+	req, _ := http.NewRequest("POST", "https://apimobile.vueling.com/Vueling.Mobile.AvailabilityService.WebAPI/api/V2/AvailabilityController/DoAirPriceSB", strings.NewReader(data))
+	//req, _ := http.NewRequest("GET", "http://httpbin.org/ip", strings.NewReader(data))
 	//req, _ := http.NewRequest("GET", "https://www.jetstar.com/au/en/booking/search-flights?s=true&adults=1&children=0&infants=0&selectedclass1=economy&currency=AUD&mon=true&channel=DESKTOP&origin1=ADL&destination1=BNE&departuredate1=2024-03-13", nil)
 	headers := map[string]string{
 		"Accept":             "application/json, text/plain, */*",
@@ -119,7 +121,7 @@ func main() {
 		"sec-ch-ua":          "\"Google Chrome\";v=\"123\", \"Not:A-Brand\";v=\"8\", \"Chromium\";v=\"123\"",
 		"sec-ch-ua-mobile":   "?1",
 		"sec-ch-ua-platform": "\"Android\"",
-		"cookie":             "AKA_A2=A; _abck=7D3BA689C6CEAE51915D3CB4935672AE~-1~YAAQ3bEPF3NCuOeOAQAAFYJ/IAvx3lbZcwK7c/IUCl8j55np0nDFUcU2i8AkJD9on5I3R8L9dh86gWx2yHO/APKf6xiAejGXKbZ1H16SHjb+r4igG+mBXkGJGnD0W4CJLl24a3B6YjKFCMfILdCFpSinBpL37++0bhWUq1QsXXYUh1jlQFbFm7cngQ9FI7fsjYyc0KwDSgMVGJY6mf28bT5K5bukbFClIQK/Zf1p/yzmagpYNV6JHp3XhU/q6Iyw3VJCYb55YOx4SCvGgnuBOjeuIBYO9p9WBDELxnlWk6ZWbspPbvx3sYLkvX+yyASuma0ywDkyJtboYUkmRaL3qBN5RJXmyHVfqYmqQqy+tKN1GEVjbCcqhvO2CCIbcBNHeWSAplg4A5d45s4ZUsZvxC7aIKMtTf1xrw==~-1~-1~-1; ak_bmsc=CDFCA1724D670A1B199ADD9AFD17F51F~000000000000000000000000000000~YAAQ3bEPF3RCuOeOAQAAFYJ/IBfrRWXTxHEiF09i7g/2AAQOCcfg71Xrnk9gsMi42Jcwx8LfRKMtWgBmJgIX+7dOwUWPvahuAg29PA+sEVOntNveXEP1RCpsp9P5EtpL3hCECW/3V98kAOlP+3gFj1PSsvIOLWsljAkzK0bwaLaZsgxpWdo+ar6iy8bymkE9unjZ9WCTwB7xgdiqw7zNw+sWnFCwiExquGlZ3ar8eqENQTxJud6KhLfXJ+yP3lW0sjImTRNQ1JZfBMN8fpXxNU7xWtyqwZ59TMSb2oVLfIH5uTLeqcW2xZ4r8t71VSaE2lQPFcoXEZjOtdns8Wi3DICnRNfh0mhkrHYLS7r1RFRIVXuiiUH3CSbQiuSMBBGnDSgi7a9nAkBh/F/k; bm_s=YAAQsHsTApwsYg2PAQAA4Fd/IAG7kqHf6LZuU9MO/CncpcmF2CVXf+eZg1/xuNJ6PBOB6lfSUmyFBbBCnLHgfqzDunbqk4zw5v3adqa2YO3siIvOHVVT8lFPDMQJAzUUe7r0pSN48jyz8K/ZC9463OwH5tfYr41uDLdbb2yFNhJ43EZ+wz9KqsbIuWOGd+6hOQrjhUsdkPatLUSVGOR8HJF2GNgzmscAjkBptpR/wzGCDgOpYPhEvgaZ4aVkP+2VQEn9FIdRc8KlaLgxU0QjuDegxhmRexVyA1b9XecyDRq1OIZUgoJQMFe+UaPr0Qj0IKyrH4+8DRIdadRvUzLHrY/0b6zEoA==; bm_ss=ab8e18ef4e; bm_sz=13C347A6666DA6FDA8F938DC6053BC27~YAAQsHsTAmctYg2PAQAALW5/IBcV/yuPmkCrhWuBNgFsMQ8zwQoG5AUCR8qAGI6e6oBfCnenW5ZVFxXcf8G9ZL39/ILs1Len+SI1HS/z0OEBT5IcoImqXw7WLwOmk/Kd2Nen1dZ5xDMKGBI/6HnLHV2I1AdC2BfdYEn464o13tp1VzOlCQVhcTB4ygWOxO5bU7LiHHmTPn/GOlaBhZbcCSpaYoie7asNnMRAYklnJbwgx1v3bvpzfMrX6yv/H708myv8vHYBkbmKVxkuPw4uUKj3FKBOkoYeRozsIQGtOoXhyjvfxuRTEOmKo/Vhem67j39Qbe117lOLP1sMTFHrh+H1L6caGxYPAxEeXb6BupWSEmT3DqNG+wGLVgbRmX1jXcXdljKHMy6BEEO8I0b0GIxJ+ao=~4277313~4605497",
+		"cookie":             "_abck=9CAC625366FC7B76FFF34C3F8A6EF17B~-1~YAAQjHfZFy1fCzWPAQAAVUnBRwuRdOyQBs9byL3NQRXHNLx3QbANEOPXA1dLXJVKQk8IFwPh1y5Tluzrni7Xrr0NOT91+dF7cJx20p/W0xvj5idVR5gglCQcGBK6yBMrNrYhlFZpv5y+VqrUpcSxoxxLQGd7RXtzAPgKFfd18HwGo2JlAlnNXhhqwL34Xr4yauFYK2J0vHUboqR6lQoFcLMB99xWuPJiWB/F7ijUVG1rHZxpjwkDqaYYR2d8e7EHY8YRDdNzgx3kjMvCquV8LvW4x2irTVvxiCuzx/ZNjhC1NBxCsbzbEZlW7HcXrcK5OnhJMoDP75C4Xf5R/12DuRqDTPBkjwfh/ZpR1KN5L9FQAeRk1il0qysy7xzRoO6Oc5lYiu8oSYS/UZJdL/KbgqCDCkuZ3k7N1Q==~-1~-1~-1; ak_bmsc=2D50F26C5A2BCDC6C81CBEA7AAE1DACA~000000000000000000000000000000~YAAQ19hLF/Rt/R2PAQAAPjvBRxdYS/ddcovFjk8S5tkN2btSHiPP0vZUh561boUKjplhPQl7QNOGspKwCCA7MmI/cDszuZC/+wW/9lO1mI06AYbanjHe3+1Vcj9hws4JE11z9Fgsys3HVm797/NwOTkCfZlF2t/gOuNCG02JreYvPbCCcAegsVtDawQ0rqLgRrwzv0aTviVT9wlrLR7hsBRWq6WWWpViTW6EeTx6GEBWRX8er/62Jf2SbJMvKoX/eUhpdYpuDbgApic4JYoPVckhO7DMQ2EJLWqeq6gLgqCQGC7EI67LCY+xSvEvyv8VR2Vm8fGeC1AEbKYQ2ImDsegW+3o2037hTU7iHJQtDdIKN8FVKkQEiaubB6VhonifjLfJ2Ueg6cs8P40SgQ==; bm_s=YAAQjHfZFy5fCzWPAQAAVUnBRwEdh7K5UYkClqszEMxWUbXpeHi2zSQI+8sCIGhXXtsPodNddfBxyWcQyGUCR+hkXFQa4rc3LPq4LrwQbqzDyXQw6730vnM8u7N7eZVhrqjoB4jc3oB4OvbPgeaWrSR0Msh8MiZN0YO2TYAQOq1voySxqErm24yCMDhHpXn5AYRSMWkOL8Y3ZHQEbBASlS/UdA7Gh7TwT6wB2nOb07/pRxHiHcVI1kJEV2wReseSYfsz86lO8h+WyTPDt4bKiCVxofKVh/D6T1toFQP99bnxwRykIQgXJ6jvpS2Ro66e6ytuAyd9TtpjD9CjMXC4nI/6gnCsU+tg17KU; bm_ss=ab8e18ef4e; bm_sz=AA5E8E12EB9C8D10BE142569549CB6DC~YAAQ19hLF/Zt/R2PAQAAPjvBRxd5sR1JaPRVCTYjgiYKky/scI8dAHf0Tg0rWq4rf28ghUg6zjlXUQeS90hyY7xYgCd4UP+DyMx3uqPpb1krAFak+UaCihluQ9sLf91ot9R3SDqBn3GrYBliNgmDkNkX6Wxir6ZPIYrnzYwPWUrPJMwM9z2cuqobHSH8cBZMYwtuZOKPTDW4pR5D7s/UfaYD1OH1Sy2ik0LAn+kh6axHg4DznAEYvB/isKeNe6rW9n8T/DokiVdOQbggcvpyoVJGqyPsi2MFDoMEuii/hOTGXxLAr3NXU9sgU0s38wgAesjJibdCcWuQ1mZONOv9N3NQEHOKGotL4NqCBQdRFvReh3g4y1MqoMne~3159363~3749937",
 	}
 	for k, v := range headers {
 		req.Header.Set(k, v)
@@ -127,6 +129,7 @@ func main() {
 	//req.Header.Set("cookie", "bm_s=YAAQm/AQAlWcvaWOAQAAFdv1ywErwYCLXjaa74pODGJyllhKS8kUrh6vJdbITuqW7skmCZ4e1JsYNri6EYa5D1YC013zlFtKoCg+KJ7b0nXJoO83godP4mL9xH3l8Z3s/iRyd908D7IM4kBSfhITyLudswOiQskazMM4DYRMmjWJEJPxPaoCsOE2qBQikV1bzhJ9Nj6hQ8PlrusBiytV8MW4W2Rcc09QpGQ489tLxFp1mgUB9LwhhwCKho9yq4dWNHKTqwpKL1wzBLYjlKgfkL3uXWBrowXJ/boZ4bwBj9v8UQOqodB3IB+THFWrCz9k/O5xVWEtgVSYNSoIaWpLkmW6F0UY; bm_ss=ab8e18ef4e; akacd_dc1=3890271670~rv=84~id=a44e2d980875c2973edc0148af4687d9; showbooking=true; bm_sz=A416F2267AD9EBB122C8A05BC133A18E~YAAQm/AQAi2dvaWOAQAAeeD1yxeONPp4iGGiCxEptJzTcD2PKdPUpf7HawF9tqGA3/2Ov2iMWgLBshFz/1YsxuhUjJzr9O/CL6AcOhmIi12MgtO11NUspP39V01CiSkuze6dCiCr7e+DoPyLfAKPtz7wyNdCSfTmR/AknIou7Q4psqDfuUxiMGLKj42+3SLTbQqxwcHYOZTanz+1eYHnZmXHxGRkUnpC9uc5GH1g40zxcQsHKgkv8uERV9FRudi+giTfrdq0Acna0VrHojeWM9Eo5OLFSJNVElPFZxQPBLrjRfNXIRoBqfaV9bYScsnGryf7HtDj37VsccBfNRHupBFyNF9Y/h8eqHVmqxzx0Q9CUStaBmcbbCM0rZpJky0tGfPbxSoEcqQqTpIRuBugVZ7NJnCX~3360051~3490371; _abck=6DA799D5C824B617650ABE27AC944135~-1~YAAQm/AQAvKhvaWOAQAAzPb1ywvyA7qx0v6uOtBDV+5thJZ0QnUBlEZ5R7dBaKolCisVObM867WKqa5UCExH1mGyMmK4hLVPSdTtVj8uEcfc6yTnk+CV10dNB2cegfDNpGqUXJrD9MGEOggYkYGAaqK1pp34UNM7/XPg76iKnbDYbzfK/irjHptmGLYboOiKilaNM1ycJ9oCg+ik0Y104l4f8CbOmBlLWeKNbVI+N8mz05W09/hlOQYjzQxMREroUllrpIzOqhUtksyRiX/0c+sFjPGwVhXjGageneecOHJLyl71DCpKc+uaH/JMpCITO9BFjzCmQ51eCNh/ke75fXfgaLTvUKwmFpvWSztJqJEZojFGYXYxWs2swYElMFMlpBQwemDBHESyGccGZ7H70Tc/JqP3OCPi~-1~-1~-1; device=mobile")
 	resp, err := client.Do(req)
 	if err != nil {
+		panic(err)
 		return
 	}
 	//resp, err := client.Get(urlArg.String())
