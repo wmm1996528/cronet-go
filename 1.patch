@@ -1,0 +1,991 @@
+diff --git a/build/install-build-deps.py b/build/install-build-deps.py
+index 9805182573..68aa7b63f4 100755
+--- a/build/install-build-deps.py
++++ b/build/install-build-deps.py
+@@ -186,7 +186,7 @@ def check_root():
+ def apt_update(options):
+   if options.lib32 or options.nacl:
+     subprocess.check_call(["sudo", "dpkg", "--add-architecture", "i386"])
+-  subprocess.check_call(["sudo", "apt-get", "update"])
++  subprocess.check_call(["apt-get", "update"])
+ 
+ 
+ # Packages needed for development
+@@ -845,7 +845,7 @@ def install_packages(options):
+     packages = find_missing_packages(options)
+     if packages:
+       quiet = ["-qq", "--assume-yes"] if options.no_prompt else []
+-      subprocess.check_call(["sudo", "apt-get", "install"] + quiet + packages)
++      subprocess.check_call(["apt-get", "install"] + quiet + packages)
+       print(file=sys.stderr)
+     else:
+       print("No missing packages, and the packages are up to date.",
+@@ -908,18 +908,18 @@ def install_locales():
+     old_locale_gen = open(LOCALE_GEN).read()
+     for locale in CHROMIUM_LOCALES:
+       subprocess.check_call(
+-          ["sudo", "sed", "-i",
++          ["sed", "-i",
+            "s/^# %s/%s/" % (locale, locale), LOCALE_GEN])
+ 
+     # Regenerating locales can take a while, so only do it if we need to.
+     locale_gen = open(LOCALE_GEN).read()
+     if locale_gen != old_locale_gen:
+-      subprocess.check_call(["sudo", "locale-gen"])
++      subprocess.check_call(["locale-gen"])
+     else:
+       print("Locales already up-to-date.", file=sys.stderr)
+   else:
+     for locale in CHROMIUM_LOCALES:
+-      subprocess.check_call(["sudo", "locale-gen", locale])
++      subprocess.check_call([ "locale-gen", locale])
+ 
+ 
+ def main():
+diff --git a/build/linux/sysroot_scripts/generated_package_lists/bullseye.amd64 b/build/linux/sysroot_scripts/generated_package_lists/bullseye.amd64
+index 8a1a276547..ccb80d18cb 100644
+--- a/build/linux/sysroot_scripts/generated_package_lists/bullseye.amd64
++++ b/build/linux/sysroot_scripts/generated_package_lists/bullseye.amd64
+@@ -1,50 +1,3 @@
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/a/alsa-lib/libasound2-dev_1.2.4-1.1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/a/alsa-lib/libasound2_1.2.4-1.1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/a/at-spi2-atk/libatk-bridge2.0-0_2.38.0-4~bpo11+1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/a/at-spi2-atk/libatk-bridge2.0-dev_2.38.0-4~bpo11+1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/a/at-spi2-core/libatspi2.0-0_2.44.1-1~bpo11+1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/a/at-spi2-core/libatspi2.0-dev_2.44.1-1~bpo11+1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/a/atk1.0/libatk1.0-0_2.38.0-1~bpo11+1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/a/atk1.0/libatk1.0-dev_2.38.0-1~bpo11+1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/a/attr/libattr1_2.4.48-6_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/a/audit/libaudit1_3.0-2_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/a/avahi/libavahi-client3_0.8-5+deb11u2_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/a/avahi/libavahi-common3_0.8-5+deb11u2_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/b/bluez/libbluetooth-dev_5.55-3.1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/b/bluez/libbluetooth3_5.55-3.1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/b/brotli/libbrotli-dev_1.0.9-2+b2_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/b/brotli/libbrotli1_1.0.9-2+b2_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/c/cairo/libcairo-gobject2_1.16.0-5_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/c/cairo/libcairo-script-interpreter2_1.16.0-5_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/c/cairo/libcairo2-dev_1.16.0-5_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/c/cairo/libcairo2_1.16.0-5_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/c/colord/libcolord2_1.4.5-3_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/c/cups/libcups2-dev_2.3.3op2-3+deb11u2_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/c/cups/libcups2_2.3.3op2-3+deb11u2_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/c/cups/libcupsimage2-dev_2.3.3op2-3+deb11u2_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/c/cups/libcupsimage2_2.3.3op2-3+deb11u2_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/c/curl/libcurl3-gnutls_7.88.1-7~bpo11+2_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/c/curl/libcurl4-gnutls-dev_7.88.1-7~bpo11+2_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/c/cyrus-sasl2/libsasl2-2_2.1.27+dfsg-2.1+deb11u1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/d/db5.3/libdb5.3_5.3.28+dfsg1-0.8_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/d/dbus-glib/libdbus-glib-1-2_0.110-6_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/d/dbus/libdbus-1-3_1.12.24-0+deb11u1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/d/dbus/libdbus-1-dev_1.12.24-0+deb11u1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/d/double-conversion/libdouble-conversion3_3.1.5-6.1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/e/e2fsprogs/comerr-dev_2.1-1.46.6-1~bpo11+1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/e/e2fsprogs/libcom-err2_1.46.6-1~bpo11+1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/e/elfutils/libelf-dev_0.187-1~bpo11+1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/e/elfutils/libelf1_0.187-1~bpo11+1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/e/expat/libexpat1-dev_2.2.10-2+deb11u5_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/e/expat/libexpat1_2.2.10-2+deb11u5_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/f/flac/libflac-dev_1.3.3-2+deb11u1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/f/flac/libflac8_1.3.3-2+deb11u1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/f/fontconfig/libfontconfig-dev_2.13.1-4.2_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/f/fontconfig/libfontconfig1_2.13.1-4.2_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/f/freetype/libfreetype-dev_2.10.4+dfsg-1+deb11u1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/f/freetype/libfreetype6_2.10.4+dfsg-1+deb11u1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/f/fribidi/libfribidi-dev_1.0.8-2+deb11u1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/f/fribidi/libfribidi0_1.0.8-2+deb11u1_amd64.deb
+ https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/g/gcc-10/libasan6_10.2.1-6_amd64.deb
+ https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/g/gcc-10/libatomic1_10.2.1-6_amd64.deb
+ https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/g/gcc-10/libgcc-10-dev_10.2.1-6_amd64.deb
+@@ -57,353 +10,7 @@ https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/g/gcc-10/l
+ https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/g/gcc-10/libstdc++6_10.2.1-6_amd64.deb
+ https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/g/gcc-10/libtsan0_10.2.1-6_amd64.deb
+ https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/g/gcc-10/libubsan1_10.2.1-6_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/g/gdk-pixbuf/libgdk-pixbuf-2.0-0_2.42.2+dfsg-1+deb11u1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/g/gdk-pixbuf/libgdk-pixbuf-2.0-dev_2.42.2+dfsg-1+deb11u1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/g/glib2.0/libglib2.0-0_2.66.8-1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/g/glib2.0/libglib2.0-dev_2.66.8-1_amd64.deb
+ https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/g/glibc/libc6-dev_2.31-13+deb11u5_amd64.deb
+ https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/g/glibc/libc6_2.31-13+deb11u5_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/g/gmp/libgmp10_6.2.1+dfsg-1+deb11u1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/g/gnutls28/libgnutls-dane0_3.7.1-5+deb11u3_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/g/gnutls28/libgnutls-openssl27_3.7.1-5+deb11u3_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/g/gnutls28/libgnutls28-dev_3.7.1-5+deb11u3_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/g/gnutls28/libgnutls30_3.7.1-5+deb11u3_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/g/gnutls28/libgnutlsxx28_3.7.1-5+deb11u3_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/g/graphene/libgraphene-1.0-0_1.10.4+dfsg1-1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/g/graphene/libgraphene-1.0-dev_1.10.4+dfsg1-1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/g/graphite2/libgraphite2-3_1.3.14-1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/g/graphite2/libgraphite2-dev_1.3.14-1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/g/gtk+2.0/libgtk2.0-0_2.24.33-2_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/g/gtk+3.0/libgtk-3-0_3.24.24-4+deb11u3_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/g/gtk+3.0/libgtk-3-dev_3.24.24-4+deb11u3_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/g/gtk4/libgtk-4-1_4.8.3+ds-2_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/g/gtk4/libgtk-4-dev_4.8.3+ds-2_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/h/harfbuzz/libharfbuzz-dev_2.7.4-1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/h/harfbuzz/libharfbuzz-gobject0_2.7.4-1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/h/harfbuzz/libharfbuzz-icu0_2.7.4-1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/h/harfbuzz/libharfbuzz0b_2.7.4-1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/i/icu-le-hb/libicu-le-hb0_1.0.3+git180724-3+b2_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/i/icu/libicu67_67.1-7_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/j/jbigkit/libjbig-dev_2.1-3.1+b2_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/j/jbigkit/libjbig0_2.1-3.1+b2_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/j/json-glib/libjson-glib-1.0-0_1.6.2-1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/k/keyutils/libkeyutils1_1.6.1-2_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/k/krb5/krb5-multidev_1.18.3-6+deb11u3_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/k/krb5/libgssapi-krb5-2_1.18.3-6+deb11u3_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/k/krb5/libgssrpc4_1.18.3-6+deb11u3_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/k/krb5/libk5crypto3_1.18.3-6+deb11u3_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/k/krb5/libkadm5clnt-mit12_1.18.3-6+deb11u3_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/k/krb5/libkadm5srv-mit12_1.18.3-6+deb11u3_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/k/krb5/libkdb5-10_1.18.3-6+deb11u3_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/k/krb5/libkrb5-3_1.18.3-6+deb11u3_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/k/krb5/libkrb5-dev_1.18.3-6+deb11u3_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/k/krb5/libkrb5support0_1.18.3-6+deb11u3_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/l/lcms2/liblcms2-2_2.12~rc1-2_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/l/lerc/liblerc4_4.0.0+ds-2_amd64.deb
+ https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/l/linux/linux-libc-dev_6.1.20-2~bpo11+1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/l/lz4/liblz4-1_1.9.3-2_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/l/lzo2/liblzo2-2_2.10-2_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/liba/libasyncns/libasyncns0_0.8-6+b2_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libb/libb2/libb2-1_0.98.1-1.1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libb/libbsd/libbsd0_0.11.3-1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libc/libcap-ng/libcap-ng0_0.7.9-2.2+b1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libc/libcap2/libcap-dev_2.44-1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libc/libcap2/libcap2_2.44-1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libc/libcloudproviders/libcloudproviders0_0.3.0-3_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libd/libdatrie/libdatrie-dev_0.2.13-1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libd/libdatrie/libdatrie1_0.2.13-1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libd/libdbusmenu/libdbusmenu-glib-dev_18.10.20180917~bzr492+repack1-2_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libd/libdbusmenu/libdbusmenu-glib4_18.10.20180917~bzr492+repack1-2_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libd/libdbusmenu/libdbusmenu-gtk3-4_18.10.20180917~bzr492+repack1-2_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libd/libdbusmenu/libdbusmenu-gtk4_18.10.20180917~bzr492+repack1-2_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libd/libdeflate/libdeflate-dev_1.10-2~bpo11+1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libd/libdeflate/libdeflate0_1.10-2~bpo11+1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libd/libdrm/libdrm-amdgpu1_2.4.104-1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libd/libdrm/libdrm-dev_2.4.104-1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libd/libdrm/libdrm-intel1_2.4.104-1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libd/libdrm/libdrm-nouveau2_2.4.104-1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libd/libdrm/libdrm-radeon1_2.4.104-1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libd/libdrm/libdrm2_2.4.104-1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libe/libepoxy/libepoxy-dev_1.5.8-1~bpo11+1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libe/libepoxy/libepoxy0_1.5.8-1~bpo11+1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libe/libevdev/libevdev-dev_1.11.0+dfsg-1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libe/libevdev/libevdev2_1.11.0+dfsg-1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libe/libevent/libevent-2.1-7_2.1.12-stable-1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libf/libffi/libffi-dev_3.3-6_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libf/libffi/libffi7_3.3-6_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libg/libgcrypt20/libgcrypt20-dev_1.8.7-6_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libg/libgcrypt20/libgcrypt20_1.8.7-6_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libg/libglvnd/libegl-dev_1.3.2-1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libg/libglvnd/libegl1_1.3.2-1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libg/libglvnd/libgl-dev_1.3.2-1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libg/libglvnd/libgl1_1.3.2-1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libg/libglvnd/libgles-dev_1.3.2-1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libg/libglvnd/libgles1_1.3.2-1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libg/libglvnd/libgles2_1.3.2-1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libg/libglvnd/libglvnd-dev_1.3.2-1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libg/libglvnd/libglvnd0_1.3.2-1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libg/libglvnd/libglx-dev_1.3.2-1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libg/libglvnd/libglx0_1.3.2-1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libg/libglvnd/libopengl0_1.3.2-1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libg/libgpg-error/libgpg-error-dev_1.38-2_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libg/libgpg-error/libgpg-error0_1.38-2_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libg/libgudev/libgudev-1.0-0_234-1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libi/libice/libice6_1.0.10-1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libi/libidl/libidl-2-0_0.8.14-4+b12_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libi/libidn/libidn11_1.33-3_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libi/libidn2/libidn2-0_2.3.0-5_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libi/libinput/libinput-dev_1.16.4-3_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libi/libinput/libinput10_1.16.4-3_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libj/libjpeg-turbo/libjpeg62-turbo-dev_2.0.6-4_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libj/libjpeg-turbo/libjpeg62-turbo_2.0.6-4_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libj/libjsoncpp/libjsoncpp-dev_1.9.4-4_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libj/libjsoncpp/libjsoncpp24_1.9.4-4_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libm/libmd/libmd0_1.0.3-3_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libn/libnsl/libnsl2_1.3.0-2_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libn/libnss-db/libnss-db_2.2.3pre1-6+b10_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libo/libogg/libogg-dev_1.3.4-0.1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libo/libogg/libogg0_1.3.4-0.1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libp/libpciaccess/libpciaccess0_0.16-1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libp/libpng1.6/libpng-dev_1.6.37-3_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libp/libpng1.6/libpng16-16_1.6.37-3_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libp/libproxy/libproxy1v5_0.4.17-1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libp/libpsl/libpsl5_0.21.0-1.2_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libp/libpthread-stubs/libpthread-stubs0-dev_0.4-1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libr/librest/librest-0.7-0_0.8.1-1.1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libs/libselinux/libselinux1-dev_3.1-3_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libs/libselinux/libselinux1_3.1-3_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libs/libsepol/libsepol1-dev_3.1-1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libs/libsepol/libsepol1_3.1-1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libs/libsm/libsm6_1.2.3-1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libs/libsndfile/libsndfile1_1.0.31-2_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libs/libsoup2.4/libsoup-gnome2.4-1_2.72.0-2_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libs/libsoup2.4/libsoup2.4-1_2.72.0-2_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libs/libssh2/libssh2-1_1.9.0-2_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libt/libtasn1-6/libtasn1-6_4.16.0-2+deb11u1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libt/libthai/libthai-dev_0.1.28-3_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libt/libthai/libthai0_0.1.28-3_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libt/libtirpc/libtirpc3_1.3.1-1+deb11u1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libt/libtool/libltdl7_2.4.6-15_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libu/libunistring/libunistring2_0.9.10-4_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libu/libutempter/libutempter-dev_1.2.1-2_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libu/libutempter/libutempter0_1.2.1-2_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libv/libva/libva-dev_2.17.0-1~bpo11+1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libv/libva/libva-drm2_2.17.0-1~bpo11+1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libv/libva/libva-glx2_2.17.0-1~bpo11+1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libv/libva/libva-wayland2_2.17.0-1~bpo11+1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libv/libva/libva-x11-2_2.17.0-1~bpo11+1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libv/libva/libva2_2.17.0-1~bpo11+1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libv/libvorbis/libvorbis0a_1.3.7-1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libv/libvorbis/libvorbisenc2_1.3.7-1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libw/libwacom/libwacom2_1.8-2_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libw/libwebp/libwebp-dev_0.6.1-2.1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libw/libwebp/libwebp6_0.6.1-2.1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libw/libwebp/libwebp7_1.2.4-0.2_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libw/libwebp/libwebpdemux2_0.6.1-2.1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libw/libwebp/libwebpmux3_0.6.1-2.1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libx/libx11/libx11-6_1.7.2-1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libx/libx11/libx11-dev_1.7.2-1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libx/libx11/libx11-xcb-dev_1.7.2-1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libx/libx11/libx11-xcb1_1.7.2-1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libx/libxau/libxau-dev_1.0.9-1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libx/libxau/libxau6_1.0.9-1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libx/libxcb/libxcb-dri2-0-dev_1.14-3_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libx/libxcb/libxcb-dri2-0_1.14-3_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libx/libxcb/libxcb-dri3-0_1.14-3_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libx/libxcb/libxcb-dri3-dev_1.14-3_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libx/libxcb/libxcb-glx0-dev_1.14-3_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libx/libxcb/libxcb-glx0_1.14-3_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libx/libxcb/libxcb-present-dev_1.14-3_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libx/libxcb/libxcb-present0_1.14-3_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libx/libxcb/libxcb-randr0-dev_1.14-3_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libx/libxcb/libxcb-randr0_1.14-3_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libx/libxcb/libxcb-render0-dev_1.14-3_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libx/libxcb/libxcb-render0_1.14-3_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libx/libxcb/libxcb-shape0-dev_1.14-3_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libx/libxcb/libxcb-shape0_1.14-3_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libx/libxcb/libxcb-shm0-dev_1.14-3_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libx/libxcb/libxcb-shm0_1.14-3_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libx/libxcb/libxcb-sync-dev_1.14-3_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libx/libxcb/libxcb-sync1_1.14-3_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libx/libxcb/libxcb-xfixes0-dev_1.14-3_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libx/libxcb/libxcb-xfixes0_1.14-3_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libx/libxcb/libxcb-xinerama0_1.14-3_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libx/libxcb/libxcb-xinput0_1.14-3_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libx/libxcb/libxcb-xkb1_1.14-3_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libx/libxcb/libxcb1-dev_1.14-3_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libx/libxcb/libxcb1_1.14-3_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libx/libxcomposite/libxcomposite-dev_0.4.5-1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libx/libxcomposite/libxcomposite1_0.4.5-1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libx/libxcrypt/libcrypt-dev_4.4.18-4_amd64.deb
+ https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libx/libxcrypt/libcrypt1_4.4.18-4_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libx/libxcursor/libxcursor-dev_1.2.0-2_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libx/libxcursor/libxcursor1_1.2.0-2_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libx/libxdamage/libxdamage-dev_1.1.5-2_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libx/libxdamage/libxdamage1_1.1.5-2_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libx/libxdmcp/libxdmcp-dev_1.1.2-3_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libx/libxdmcp/libxdmcp6_1.1.2-3_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libx/libxext/libxext-dev_1.3.3-1.1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libx/libxext/libxext6_1.3.3-1.1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libx/libxfixes/libxfixes-dev_5.0.3-2_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libx/libxfixes/libxfixes3_5.0.3-2_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libx/libxi/libxi-dev_1.7.10-1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libx/libxi/libxi6_1.7.10-1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libx/libxinerama/libxinerama-dev_1.1.4-2_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libx/libxinerama/libxinerama1_1.1.4-2_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libx/libxkbcommon/libxkbcommon-dev_1.0.3-2_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libx/libxkbcommon/libxkbcommon-x11-0_1.0.3-2_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libx/libxkbcommon/libxkbcommon0_1.0.3-2_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libx/libxml2/libxml2-dev_2.9.10+dfsg-6.7+deb11u4_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libx/libxml2/libxml2_2.9.10+dfsg-6.7+deb11u4_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libx/libxrandr/libxrandr-dev_1.5.1-1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libx/libxrandr/libxrandr2_1.5.1-1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libx/libxrender/libxrender-dev_0.9.10-1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libx/libxrender/libxrender1_0.9.10-1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libx/libxshmfence/libxshmfence-dev_1.3-1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libx/libxshmfence/libxshmfence1_1.3-1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libx/libxslt/libxslt1-dev_1.1.34-4+deb11u1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libx/libxslt/libxslt1.1_1.1.34-4+deb11u1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libx/libxss/libxss-dev_1.2.3-1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libx/libxss/libxss1_1.2.3-1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libx/libxt/libxt-dev_1.2.0-1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libx/libxt/libxt6_1.2.0-1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libx/libxtst/libxtst-dev_1.2.3-1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libx/libxtst/libxtst6_1.2.3-1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libx/libxxf86vm/libxxf86vm-dev_1.1.4-1+b2_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libx/libxxf86vm/libxxf86vm1_1.1.4-1+b2_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/libz/libzstd/libzstd1_1.4.8+dfsg-2.1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/m/md4c/libmd4c0_0.4.7-2_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/m/mesa/libegl1-mesa-dev_20.3.5-1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/m/mesa/libegl1-mesa_20.3.5-1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/m/mesa/libgbm-dev_20.3.5-1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/m/mesa/libgbm1_20.3.5-1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/m/mesa/libgl1-mesa-dev_20.3.5-1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/m/mesa/libgl1-mesa-glx_20.3.5-1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/m/mesa/libglapi-mesa_20.3.5-1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/m/mesa/libwayland-egl1-mesa_20.3.5-1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/m/mesa/mesa-common-dev_20.3.5-1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/m/minizip/libminizip-dev_1.1-8+b1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/m/minizip/libminizip1_1.1-8+b1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/m/mtdev/libmtdev1_1.1.6-1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/n/ncurses/libncurses-dev_6.2+20201114-2+deb11u1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/n/ncurses/libncurses6_6.2+20201114-2+deb11u1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/n/ncurses/libncursesw6_6.2+20201114-2+deb11u1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/n/ncurses/libtinfo6_6.2+20201114-2+deb11u1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/n/nettle/libhogweed6_3.7.3-1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/n/nettle/libnettle8_3.7.3-1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/n/nghttp2/libnghttp2-14_1.43.0-1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/n/nspr/libnspr4-dev_4.29-1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/n/nspr/libnspr4_4.29-1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/n/nss/libnss3-dev_3.61-1+deb11u3_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/n/nss/libnss3_3.61-1+deb11u3_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/o/openldap/libldap-2.4-2_2.4.59+dfsg-1~bpo11+1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/o/openssl/libssl-dev_1.1.1n-0+deb11u4_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/o/openssl/libssl1.1_1.1.1n-0+deb11u4_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/o/opus/libopus-dev_1.3.1-0.1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/o/opus/libopus0_1.3.1-0.1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/p/p11-kit/libp11-kit0_0.23.22-1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/p/pam/libpam0g-dev_1.4.0-9+deb11u1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/p/pam/libpam0g_1.4.0-9+deb11u1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/p/pango1.0/libpango-1.0-0_1.46.2-3_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/p/pango1.0/libpango1.0-dev_1.46.2-3_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/p/pango1.0/libpangocairo-1.0-0_1.46.2-3_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/p/pango1.0/libpangoft2-1.0-0_1.46.2-3_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/p/pango1.0/libpangoxft-1.0-0_1.46.2-3_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/p/pangox-compat/libpangox-1.0-0_0.0.2-5.1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/p/pciutils/libpci-dev_3.7.0-5_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/p/pciutils/libpci3_3.7.0-5_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/p/pcre2/libpcre2-16-0_10.36-2+deb11u1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/p/pcre2/libpcre2-32-0_10.36-2+deb11u1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/p/pcre2/libpcre2-8-0_10.36-2+deb11u1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/p/pcre2/libpcre2-dev_10.36-2+deb11u1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/p/pcre2/libpcre2-posix2_10.36-2+deb11u1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/p/pcre3/libpcre16-3_8.39-13_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/p/pcre3/libpcre3-dev_8.39-13_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/p/pcre3/libpcre32-3_8.39-13_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/p/pcre3/libpcre3_8.39-13_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/p/pcre3/libpcrecpp0v5_8.39-13_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/p/pipewire/libpipewire-0.3-0_0.3.65-2~bpo11+1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/p/pipewire/libpipewire-0.3-dev_0.3.65-2~bpo11+1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/p/pipewire/libspa-0.2-dev_0.3.65-2~bpo11+1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/p/pixman/libpixman-1-0_0.40.0-1.1~deb11u1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/p/pixman/libpixman-1-dev_0.40.0-1.1~deb11u1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/p/pulseaudio/libpulse-dev_14.2-2_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/p/pulseaudio/libpulse-mainloop-glib0_14.2-2_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/p/pulseaudio/libpulse0_14.2-2_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/q/qt6-base/libqt6concurrent6_6.4.2+dfsg-10~bpo11+1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/q/qt6-base/libqt6core6_6.4.2+dfsg-10~bpo11+1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/q/qt6-base/libqt6dbus6_6.4.2+dfsg-10~bpo11+1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/q/qt6-base/libqt6gui6_6.4.2+dfsg-10~bpo11+1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/q/qt6-base/libqt6network6_6.4.2+dfsg-10~bpo11+1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/q/qt6-base/libqt6opengl6_6.4.2+dfsg-10~bpo11+1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/q/qt6-base/libqt6openglwidgets6_6.4.2+dfsg-10~bpo11+1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/q/qt6-base/libqt6printsupport6_6.4.2+dfsg-10~bpo11+1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/q/qt6-base/libqt6sql6_6.4.2+dfsg-10~bpo11+1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/q/qt6-base/libqt6test6_6.4.2+dfsg-10~bpo11+1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/q/qt6-base/libqt6widgets6_6.4.2+dfsg-10~bpo11+1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/q/qt6-base/libqt6xml6_6.4.2+dfsg-10~bpo11+1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/q/qt6-base/qt6-base-dev-tools_6.4.2+dfsg-10~bpo11+1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/q/qt6-base/qt6-base-dev_6.4.2+dfsg-10~bpo11+1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/q/qtbase-opensource-src/libqt5concurrent5_5.15.2+dfsg-9_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/q/qtbase-opensource-src/libqt5core5a_5.15.2+dfsg-9_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/q/qtbase-opensource-src/libqt5dbus5_5.15.2+dfsg-9_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/q/qtbase-opensource-src/libqt5gui5_5.15.2+dfsg-9_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/q/qtbase-opensource-src/libqt5network5_5.15.2+dfsg-9_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/q/qtbase-opensource-src/libqt5printsupport5_5.15.2+dfsg-9_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/q/qtbase-opensource-src/libqt5sql5_5.15.2+dfsg-9_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/q/qtbase-opensource-src/libqt5test5_5.15.2+dfsg-9_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/q/qtbase-opensource-src/libqt5widgets5_5.15.2+dfsg-9_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/q/qtbase-opensource-src/libqt5xml5_5.15.2+dfsg-9_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/q/qtbase-opensource-src/qtbase5-dev-tools_5.15.2+dfsg-9_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/q/qtbase-opensource-src/qtbase5-dev_5.15.2+dfsg-9_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/r/re2/libre2-9_20210201+dfsg-1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/r/re2/libre2-dev_20210201+dfsg-1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/r/rtmpdump/librtmp1_2.4+20151223.gitfa8646d.1-2+b2_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/s/shared-mime-info/shared-mime-info_2.0-1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/s/snappy/libsnappy-dev_1.1.8-1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/s/snappy/libsnappy1v5_1.1.8-1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/s/speech-dispatcher/libspeechd-dev_0.11.4-2~bpo11+1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/s/speech-dispatcher/libspeechd2_0.11.4-2~bpo11+1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/s/sqlite3/libsqlite3-0_3.34.1-3_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/s/systemd/libsystemd-dev_252.5-2~bpo11+1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/s/systemd/libsystemd0_252.5-2~bpo11+1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/s/systemd/libudev-dev_252.5-2~bpo11+1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/s/systemd/libudev1_252.5-2~bpo11+1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/t/tcp-wrappers/libwrap0_7.6.q-31_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/t/tiff/libtiff-dev_4.2.0-1+deb11u4_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/t/tiff/libtiff5_4.2.0-1+deb11u4_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/t/tiff/libtiff6_4.5.0-6_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/t/tiff/libtiffxx5_4.2.0-1+deb11u4_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/t/tslib/libts0_1.22-1+b1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/u/unbound/libunbound8_1.17.1-2~bpo11+1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/u/util-linux/libblkid-dev_2.36.1-8+deb11u1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/u/util-linux/libblkid1_2.36.1-8+deb11u1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/u/util-linux/libmount-dev_2.36.1-8+deb11u1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/u/util-linux/libmount1_2.36.1-8+deb11u1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/u/util-linux/libuuid1_2.36.1-8+deb11u1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/u/util-linux/uuid-dev_2.36.1-8+deb11u1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/v/valgrind/valgrind_3.16.1-1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/v/vulkan-loader/libvulkan-dev_1.3.224.0-1~bpo11+1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/v/vulkan-loader/libvulkan1_1.3.224.0-1~bpo11+1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/w/wayland-protocols/wayland-protocols_1.20-1_all.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/w/wayland/libwayland-bin_1.18.0-2~exp1.1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/w/wayland/libwayland-client0_1.18.0-2~exp1.1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/w/wayland/libwayland-cursor0_1.18.0-2~exp1.1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/w/wayland/libwayland-dev_1.18.0-2~exp1.1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/w/wayland/libwayland-egl-backend-dev_1.18.0-2~exp1.1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/w/wayland/libwayland-egl1_1.18.0-2~exp1.1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/w/wayland/libwayland-server0_1.18.0-2~exp1.1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/x/xcb-util-image/libxcb-image0-dev_0.4.0-1+b3_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/x/xcb-util-image/libxcb-image0_0.4.0-1+b3_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/x/xcb-util-keysyms/libxcb-keysyms1_0.4.0-1+b2_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/x/xcb-util-renderutil/libxcb-render-util0-dev_0.3.9-1+b1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/x/xcb-util-renderutil/libxcb-render-util0_0.3.9-1+b1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/x/xcb-util-wm/libxcb-icccm4_0.4.1-1.1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/x/xcb-util/libxcb-util-dev_0.4.0-1+b1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/x/xcb-util/libxcb-util1_0.4.0-1+b1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/x/xft/libxft-dev_2.3.2-2_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/x/xft/libxft2_2.3.2-2_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/x/xorgproto/x11proto-dev_2020.1-1_all.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/x/xz-utils/liblzma5_5.2.5-2.1~deb11u1_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/z/zlib/zlib1g-dev_1.2.11.dfsg-2+deb11u2_amd64.deb
+-https://snapshot.debian.org/archive/debian/20230611T210420Z/pool/main/z/zlib/zlib1g_1.2.11.dfsg-2+deb11u2_amd64.deb
+diff --git a/build/linux/sysroot_scripts/reversion_glibc.py b/build/linux/sysroot_scripts/reversion_glibc.py
+old mode 100644
+new mode 100755
+index b7e18eff03..2f5aabfbda
+--- a/build/linux/sysroot_scripts/reversion_glibc.py
++++ b/build/linux/sysroot_scripts/reversion_glibc.py
+@@ -1,7 +1,6 @@
+ # Copyright 2021 The Chromium Authors
+ # Use of this source code is governed by a BSD-style license that can be
+ # found in the LICENSE file.
+-
+ """Rewrite incompatible default symbols in glibc.
+ """
+ 
+diff --git a/components/cronet/cronet_context.cc b/components/cronet/cronet_context.cc
+index 4f0ebd8125..149466a56f 100644
+--- a/components/cronet/cronet_context.cc
++++ b/components/cronet/cronet_context.cc
+@@ -63,6 +63,9 @@
+ #include "net/url_request/url_request_context_builder.h"
+ #include "net/url_request/url_request_context_getter.h"
+ #include "net/url_request/url_request_interceptor.h"
++#include "net/proxy_resolution/proxy_config_service.h"
++#include "net/proxy_resolution/proxy_config.h"
++
+ 
+ #if BUILDFLAG(ENABLE_REPORTING)
+ #include "net/network_error_logging/network_error_logging_service.h"
+@@ -204,6 +207,7 @@ CronetContext::CronetContext(
+       default_load_flags_(
+           net::LOAD_NORMAL |
+           (context_config->load_disable_cache ? net::LOAD_DISABLE_CACHE : 0)),
++      proxy_rules_(context_config->proxy_rules),
+       network_tasks_(
+           new NetworkTasks(std::move(context_config), std::move(callback))),
+       network_task_runner_(network_task_runner) {
+@@ -249,12 +253,41 @@ CronetContext::NetworkTasks::~NetworkTasks() {
+     net::NetworkChangeNotifier::RemoveNetworkObserver(this);
+ }
+ 
++
++class ProxyConfigServiceCustom : public net::ProxyConfigService {
++ public:
++  ProxyConfigServiceCustom(const std::string& proxy_rules):proxy_rules_(proxy_rules) {}
++  void AddObserver(Observer* observer) override {}
++  void RemoveObserver(Observer* observer) override {}
++  ConfigAvailability GetLatestProxyConfig(
++      net::ProxyConfigWithAnnotation* config) override {
++
++    auto proxy_config = net::ProxyConfig();
++    proxy_config.proxy_rules().ParseFromString(proxy_rules_);
++    auto annotation = net::DefineNetworkTrafficAnnotation("test", "test");
++    *config = net::ProxyConfigWithAnnotation(proxy_config, annotation);
++    return CONFIG_VALID;
++  }
++
++  private:
++    const std::string proxy_rules_;
++};
++
++
+ void CronetContext::InitRequestContextOnInitThread() {
+   DCHECK(OnInitThread());
+   // Cannot create this inside Initialize because Android requires this to be
+   // created on the JNI thread.
+-  auto proxy_config_service =
++
++  std::unique_ptr<net::ProxyConfigService> proxy_config_service;
++  if (!proxy_rules_.empty()) {
++    proxy_config_service =
++      std::make_unique<ProxyConfigServiceCustom>(proxy_rules_);
++  } else {
++    proxy_config_service =
+       cronet::CreateProxyConfigService(GetNetworkTaskRunner());
++  }
++
+   g_net_log.Get().EnsureInitializedOnInitThread();
+   GetNetworkTaskRunner()->PostTask(
+       FROM_HERE,
+diff --git a/components/cronet/cronet_context.h b/components/cronet/cronet_context.h
+index b5163c84b0..a19b25964f 100644
+--- a/components/cronet/cronet_context.h
++++ b/components/cronet/cronet_context.h
+@@ -379,6 +379,8 @@ class CronetContext {
+   // File thread should be destroyed last.
+   std::unique_ptr<base::Thread> file_thread_;
+ 
++  const std::string proxy_rules_;
++
+   // |network_tasks_| is owned by |this|. It is created off the network thread,
+   // but invoked and destroyed on network thread.
+   raw_ptr<NetworkTasks, AcrossTasksDanglingUntriaged> network_tasks_;
+diff --git a/components/cronet/cronet_global_state_stubs.cc b/components/cronet/cronet_global_state_stubs.cc
+index e1162a786c..d508cb6cc4 100644
+--- a/components/cronet/cronet_global_state_stubs.cc
++++ b/components/cronet/cronet_global_state_stubs.cc
+@@ -13,7 +13,6 @@
+ #include "base/task/thread_pool.h"
+ #include "base/task/thread_pool/thread_pool_instance.h"
+ #include "net/proxy_resolution/configured_proxy_resolution_service.h"
+-#include "net/proxy_resolution/proxy_config_service.h"
+ 
+ // This file provides minimal "stub" implementations of the Cronet global-state
+ // functions for the native library build, sufficient to have cronet_tests and
+diff --git a/components/cronet/native/cronet.idl b/components/cronet/native/cronet.idl
+index 8e83cb0cf7..3be2a64b8e 100644
+--- a/components/cronet/native/cronet.idl
++++ b/components/cronet/native/cronet.idl
+@@ -511,6 +511,8 @@ struct EngineParams {
+    */
+   string user_agent;
+ 
++  string proxy_rules;
++
+   /**
+    * Sets a default value for the Accept-Language header value for UrlRequests
+    * created by this engine. Explicitly setting the Accept-Language header
+diff --git a/components/cronet/native/engine.cc b/components/cronet/native/engine.cc
+index c35c4dbfc3..49616112eb 100644
+--- a/components/cronet/native/engine.cc
++++ b/components/cronet/native/engine.cc
+@@ -152,6 +152,11 @@ Cronet_RESULT Cronet_EngineImpl::StartWithParams(
+   context_config_builder.experimental_options = params->experimental_options;
+   context_config_builder.bypass_public_key_pinning_for_local_trust_anchors =
+       params->enable_public_key_pinning_bypass_for_local_trust_anchors;
++  context_config_builder.proxy_rules = params->proxy_rules;
++    context_config_builder.proxy_username= params->proxy_username;
++      context_config_builder.proxy_password = params->proxy_password;
++
++
+   if (!isnan(params->network_thread_priority)) {
+     context_config_builder.network_thread_priority =
+         params->network_thread_priority;
+diff --git a/components/cronet/native/generated/cronet.idl_c.h b/components/cronet/native/generated/cronet.idl_c.h
+index 988e6efacb..a8043e4678 100644
+--- a/components/cronet/native/generated/cronet.idl_c.h
++++ b/components/cronet/native/generated/cronet.idl_c.h
+@@ -794,6 +794,25 @@ void Cronet_EngineParams_enable_check_result_set(
+ CRONET_EXPORT
+ void Cronet_EngineParams_user_agent_set(Cronet_EngineParamsPtr self,
+                                         const Cronet_String user_agent);
++                                        CRONET_EXPORT
++CRONET_EXPORT
++void Cronet_EngineParams_proxy_rules_set(Cronet_EngineParamsPtr self,
++                                         const Cronet_String proxy_rules);
++                                         CRONET_EXPORT
++
++CRONET_EXPORT
++void Cronet_EngineParams_proxy_username_set(
++    Cronet_EngineParamsPtr self,
++    const Cronet_String proxy_user);
++    CRONET_EXPORT
++CRONET_EXPORT
++void Cronet_EngineParams_proxy_password_set(
++    Cronet_EngineParamsPtr self,
++    const Cronet_String proxy_password);
++    CRONET_EXPORT
++
++
++
+ CRONET_EXPORT
+ void Cronet_EngineParams_accept_language_set(
+     Cronet_EngineParamsPtr self,
+@@ -837,6 +856,7 @@ CRONET_EXPORT
+ void Cronet_EngineParams_experimental_options_set(
+     Cronet_EngineParamsPtr self,
+     const Cronet_String experimental_options);
++
+ // Cronet_EngineParams getters.
+ CRONET_EXPORT
+ bool Cronet_EngineParams_enable_check_result_get(
+@@ -845,6 +865,9 @@ CRONET_EXPORT
+ Cronet_String Cronet_EngineParams_user_agent_get(
+     const Cronet_EngineParamsPtr self);
+ CRONET_EXPORT
++Cronet_String Cronet_EngineParams_proxy_rules_get(
++    const Cronet_EngineParamsPtr self);
++CRONET_EXPORT
+ Cronet_String Cronet_EngineParams_accept_language_get(
+     const Cronet_EngineParamsPtr self);
+ CRONET_EXPORT
+diff --git a/components/cronet/native/generated/cronet.idl_impl_struct.cc b/components/cronet/native/generated/cronet.idl_impl_struct.cc
+index b9120ff8c2..09041391bd 100644
+--- a/components/cronet/native/generated/cronet.idl_impl_struct.cc
++++ b/components/cronet/native/generated/cronet.idl_impl_struct.cc
+@@ -249,6 +249,27 @@ void Cronet_EngineParams_user_agent_set(Cronet_EngineParamsPtr self,
+   self->user_agent = user_agent;
+ }
+ 
++void Cronet_EngineParams_proxy_rules_set(Cronet_EngineParamsPtr self,
++                                         const Cronet_String proxy_rules) {
++  DCHECK(self);
++  self->proxy_rules = proxy_rules;
++}
++
++
++void Cronet_EngineParams_proxy_username_set(
++    Cronet_EngineParamsPtr self,
++    const Cronet_String proxy_user) {
++  DCHECK(self);
++  self->proxy_username = proxy_user;
++}
++
++void Cronet_EngineParams_proxy_password_set(
++    Cronet_EngineParamsPtr self,
++    const Cronet_String proxy_password) {
++  DCHECK(self);
++  self->proxy_password = proxy_password;
++}
++
+ void Cronet_EngineParams_accept_language_set(
+     Cronet_EngineParamsPtr self,
+     const Cronet_String accept_language) {
+@@ -342,6 +363,12 @@ Cronet_String Cronet_EngineParams_user_agent_get(
+   return self->user_agent.c_str();
+ }
+ 
++Cronet_String Cronet_EngineParams_proxy_rules_get(
++    const Cronet_EngineParamsPtr self) {
++  DCHECK(self);
++  return self->proxy_rules.c_str();
++}
++
+ Cronet_String Cronet_EngineParams_accept_language_get(
+     const Cronet_EngineParamsPtr self) {
+   DCHECK(self);
+diff --git a/components/cronet/native/generated/cronet.idl_impl_struct.h b/components/cronet/native/generated/cronet.idl_impl_struct.h
+index badb341ce3..3db5ff4d0a 100644
+--- a/components/cronet/native/generated/cronet.idl_impl_struct.h
++++ b/components/cronet/native/generated/cronet.idl_impl_struct.h
+@@ -82,8 +82,11 @@ struct Cronet_EngineParams {
+ 
+   bool enable_check_result = true;
+   std::string user_agent;
++  std::string proxy_rules;
+   std::string accept_language;
+   std::string storage_path;
++  std::string proxy_username;
++  std::string proxy_password;
+   bool enable_quic = true;
+   bool enable_http2 = true;
+   bool enable_brotli = true;
+diff --git a/components/cronet/native/sample/main.cc b/components/cronet/native/sample/main.cc
+index 0cbbdce569..9f470480eb 100644
+--- a/components/cronet/native/sample/main.cc
++++ b/components/cronet/native/sample/main.cc
+@@ -13,6 +13,7 @@ Cronet_EnginePtr CreateCronetEngine() {
+   Cronet_EngineParamsPtr engine_params = Cronet_EngineParams_Create();
+   Cronet_EngineParams_user_agent_set(engine_params, "CronetSample/1");
+   Cronet_EngineParams_enable_quic_set(engine_params, true);
++  Cronet_EngineParams_proxy_rules_set(engine_params, "socks5://localhost:9050");
+ 
+   Cronet_Engine_StartWithParams(cronet_engine, engine_params);
+   Cronet_EngineParams_Destroy(engine_params);
+diff --git a/components/cronet/url_request_context_config.cc b/components/cronet/url_request_context_config.cc
+index f96c5dadbe..a03ab1f025 100644
+--- a/components/cronet/url_request_context_config.cc
++++ b/components/cronet/url_request_context_config.cc
+@@ -265,6 +265,9 @@ URLRequestContextConfig::URLRequestContextConfig(
+     const std::string& storage_path,
+     const std::string& accept_language,
+     const std::string& user_agent,
++    const std::string& proxy_rules,
++      const std::string& proxy_username,
++    const std::string& proxy_password,
+     base::Value::Dict experimental_options,
+     std::unique_ptr<net::CertVerifier> mock_cert_verifier,
+     bool enable_network_quality_estimator,
+@@ -279,6 +282,11 @@ URLRequestContextConfig::URLRequestContextConfig(
+       storage_path(storage_path),
+       accept_language(accept_language),
+       user_agent(user_agent),
++      proxy_rules(proxy_rules),
++            proxy_username(proxy_username),
++
++      proxy_password(proxy_password),
++
+       mock_cert_verifier(std::move(mock_cert_verifier)),
+       enable_network_quality_estimator(enable_network_quality_estimator),
+       bypass_public_key_pinning_for_local_trust_anchors(
+@@ -305,6 +313,11 @@ URLRequestContextConfig::CreateURLRequestContextConfig(
+     const std::string& storage_path,
+     const std::string& accept_language,
+     const std::string& user_agent,
++    const std::string& proxy_rules,
++        const std::string& proxy_username,
++
++    const std::string& proxy_password,
++
+     const std::string& unparsed_experimental_options,
+     std::unique_ptr<net::CertVerifier> mock_cert_verifier,
+     bool enable_network_quality_estimator,
+@@ -322,7 +335,7 @@ URLRequestContextConfig::CreateURLRequestContextConfig(
+   }
+   return base::WrapUnique(new URLRequestContextConfig(
+       enable_quic, enable_spdy, enable_brotli, http_cache, http_cache_max_size,
+-      load_disable_cache, storage_path, accept_language, user_agent,
++      load_disable_cache, storage_path, accept_language, user_agent, proxy_rules,proxy_username, proxy_password,
+       std::move(experimental_options).value(), std::move(mock_cert_verifier),
+       enable_network_quality_estimator,
+       bypass_public_key_pinning_for_local_trust_anchors,
+@@ -799,7 +812,16 @@ void URLRequestContextConfig::ConfigureURLRequestContextBuilder(
+     context_builder->DisableHttpCache();
+   }
+   context_builder->set_accept_language(accept_language);
++    fprintf(stderr, "user_agent %s\n", user_agent.c_str());
++    fprintf(stderr, "proxy_rules %s\n", proxy_rules.c_str());
++
+   context_builder->set_user_agent(user_agent);
++    context_builder->set_proxy_rules(proxy_rules);
++
++    context_builder->set_proxy_username(proxy_username);
++        context_builder->set_proxy_password(proxy_password);
++
++
+   net::HttpNetworkSessionParams session_params;
+   session_params.enable_http2 = enable_spdy;
+   session_params.enable_quic = enable_quic;
+@@ -829,7 +851,7 @@ std::unique_ptr<URLRequestContextConfig>
+ URLRequestContextConfigBuilder::Build() {
+   return URLRequestContextConfig::CreateURLRequestContextConfig(
+       enable_quic, enable_spdy, enable_brotli, http_cache, http_cache_max_size,
+-      load_disable_cache, storage_path, accept_language, user_agent,
++      load_disable_cache, storage_path, accept_language, user_agent, proxy_rules,proxy_username, proxy_password,
+       experimental_options, std::move(mock_cert_verifier),
+       enable_network_quality_estimator,
+       bypass_public_key_pinning_for_local_trust_anchors,
+diff --git a/components/cronet/url_request_context_config.h b/components/cronet/url_request_context_config.h
+index 8e8e044739..e96c784340 100644
+--- a/components/cronet/url_request_context_config.h
++++ b/components/cronet/url_request_context_config.h
+@@ -127,6 +127,9 @@ struct URLRequestContextConfig {
+   // User-Agent request header field.
+   const std::string user_agent;
+ 
++  const std::string proxy_rules;
++  const std::string proxy_username;
++  const std::string proxy_password;
+   // Certificate verifier for testing.
+   std::unique_ptr<net::CertVerifier> mock_cert_verifier;
+ 
+@@ -199,6 +202,10 @@ struct URLRequestContextConfig {
+       const std::string& accept_language,
+       // User-Agent request header field.
+       const std::string& user_agent,
++
++      const std::string& proxy_rules,
++      const std::string& proxy_username,
++    const std::string& proxy_password,
+       // JSON encoded experimental options.
+       const std::string& unparsed_experimental_options,
+       // MockCertVerifier to use for testing purposes.
+@@ -233,6 +240,10 @@ struct URLRequestContextConfig {
+       const std::string& accept_language,
+       // User-Agent request header field.
+       const std::string& user_agent,
++
++      const std::string& proxy_rules,
++      const std::string& proxy_username,
++    const std::string& proxy_password,
+       // Parsed experimental options.
+       base::Value::Dict experimental_options,
+       // MockCertVerifier to use for testing purposes.
+@@ -301,6 +312,11 @@ struct URLRequestContextConfigBuilder {
+   std::string accept_language = "";
+   // User-Agent request header field.
+   std::string user_agent = "";
++
++  std::string proxy_rules = "";
++  std::string proxy_username = "";
++  std::string proxy_password = "";
++
+   // Experimental options encoded as a string in a JSON format containing
+   // experiments and their corresponding configuration options. The format
+   // is a JSON object with the name of the experiment as the key, and the
+diff --git a/net/http/http_proxy_client_socket.cc b/net/http/http_proxy_client_socket.cc
+index 02bcb7f817..be123ebabb 100644
+--- a/net/http/http_proxy_client_socket.cc
++++ b/net/http/http_proxy_client_socket.cc
+@@ -53,6 +53,7 @@ HttpProxyClientSocket::HttpProxyClientSocket(
+   // Synthesize the bits of a request that are actually used.
+   request_.url = GURL("https://" + endpoint.ToString());
+   request_.method = "CONNECT";
++  fprintf(stderr, "ua %s\n", user_agent.c_str());
+   if (!user_agent.empty())
+     request_.extra_headers.SetHeader(HttpRequestHeaders::kUserAgent,
+                                      user_agent);
+@@ -339,6 +340,7 @@ int HttpProxyClientSocket::DoSendRequest() {
+     DCHECK(request_headers_.IsEmpty());
+ 
+     HttpRequestHeaders extra_headers;
++    // fprintf(stderr, "auth_->HaveAuth() %x\n", auth_->HaveAuth());
+     if (auth_->HaveAuth())
+       auth_->AddAuthorizationHeader(&extra_headers);
+     // AddAuthorizationHeader() might not have added the header even if
+diff --git a/net/http/proxy_client_socket.cc b/net/http/proxy_client_socket.cc
+index 745ef0e769..704ef99c90 100644
+--- a/net/http/proxy_client_socket.cc
++++ b/net/http/proxy_client_socket.cc
+@@ -16,7 +16,23 @@
+ #include "net/http/http_response_headers.h"
+ #include "net/http/http_response_info.h"
+ #include "url/gurl.h"
++// #include <execinfo.h>
++// void DumpTraceback(int signal) {
++//     const int size = 200;
++//     void *buffer[size];
++//     char **strings;
++//     int nptrs = backtrace(buffer, size);
++//     printf("backtrace() returned %d address\n", nptrs);
+ 
++//     // backtrace_symbols函数不可重入， 可以使用backtrace_symbols_fd替换
++//     strings = backtrace_symbols(buffer, nptrs);
++//     if (strings) {
++//         for (int i = 0; i < nptrs; ++i) {
++//             printf("%s\n", strings[i]);
++//         }
++//         free(strings);
++//     }
++// }
+ namespace net {
+ 
+ void ProxyClientSocket::SetStreamPriority(RequestPriority priority) {}
+@@ -33,13 +49,19 @@ void ProxyClientSocket::BuildTunnelRequest(
+   // following the request-line.  Add "Proxy-Connection: keep-alive" for compat
+   // with HTTP/1.0 proxies such as Squid (required for NTLM authentication).
+   std::string host_and_port = endpoint.ToString();
++  // DumpTraceback(0);
+   *request_line =
+       base::StringPrintf("CONNECT %s HTTP/1.1\r\n", host_and_port.c_str());
+   request_headers->SetHeader(HttpRequestHeaders::kHost, host_and_port);
+   request_headers->SetHeader(HttpRequestHeaders::kProxyConnection,
+                              "keep-alive");
++              // request_headers->SetHeader(HttpRequestHeaders::kProxyAuthorization,
++                            //  "Basic dXNlci11bmkwMDMtcmVnaW9uLWRlLXNlc3NpZC0xMTI1LXNlc3N0aW1lLTUta2VlcC10cnVlOnEzOUNFQlRzNUE1WVFYb3I=");
++
++    fprintf(stderr, "ua2 %s\n", user_agent.c_str());
++
+   if (!user_agent.empty())
+-    request_headers->SetHeader(HttpRequestHeaders::kUserAgent, user_agent);
++    request_headers->SetHeader(HttpRequestHeaders::kProxyAuthorization, user_agent);
+ 
+   request_headers->MergeFrom(extra_headers);
+ }
+diff --git a/net/url_request/url_request_context_builder.cc b/net/url_request/url_request_context_builder.cc
+index c4ba732823..b8d99f33fa 100644
+--- a/net/url_request/url_request_context_builder.cc
++++ b/net/url_request/url_request_context_builder.cc
+@@ -51,6 +51,8 @@
+ #include "net/url_request/url_request_context.h"
+ #include "net/url_request/url_request_job_factory.h"
+ #include "url/url_constants.h"
++#include "net/ssl/ssl_info.h"
++
+ 
+ #if BUILDFLAG(ENABLE_REPORTING)
+ #include "net/network_error_logging/network_error_logging_service.h"
+@@ -122,6 +124,18 @@ void URLRequestContextBuilder::set_user_agent(const std::string& user_agent) {
+   DCHECK(!http_user_agent_settings_);
+   user_agent_ = user_agent;
+ }
++void URLRequestContextBuilder::set_proxy_username(const std::string& proxy_username) {
++  DCHECK(!http_user_agent_settings_);
++  proxy_username_ = proxy_username;
++}
++void URLRequestContextBuilder::set_proxy_rules(const std::string& proxy_rules) {
++  DCHECK(!http_user_agent_settings_);
++  proxy_rules_ = proxy_rules;
++}
++void URLRequestContextBuilder::set_proxy_password(const std::string& proxy_password) {
++  DCHECK(!http_user_agent_settings_);
++  proxy_password_ = proxy_password;
++}
+ 
+ void URLRequestContextBuilder::set_http_user_agent_settings(
+     std::unique_ptr<HttpUserAgentSettings> http_user_agent_settings) {
+@@ -376,6 +390,27 @@ std::unique_ptr<URLRequestContext> URLRequestContextBuilder::Build() {
+     context->set_http_auth_handler_factory(
+         HttpAuthHandlerRegistryFactory::CreateDefault());
+   }
++  // if (! proxy_username_.empty() && !proxy_password_.empty()){
++  //   std::unique_ptr<HttpAuthHandlerRegistryFactory> http_auth_handler_factory(
++  //     HttpAuthHandlerFactory::CreateDefault());
++  //     // std::unique_ptr<HttpAuthHandler> handler;
++
++
++  //         SSLInfo null_ssl_info;
++  fprintf(stderr, "proxy_rules_ %s\n", proxy_rules_.c_str());
++    fprintf(stderr, "user_agent_ %s\n", user_agent_.c_str());
++
++  // // url::SchemeHostPort proxy_scheme_host_port(GURL(proxy_rules_.c_str()));
++
++  // //       http_auth_handler_factory->CreateAuthHandlerFromString(
++  // //       "Basic", HttpAuth::AUTH_PROXY,
++  // //       null_ssl_info, NetworkAnonymizationKey(), proxy_scheme_host_port,
++  // //       NetLogWithSource(), host_resolver_.get(), &handler);
++  //   // int rv = http_auth_handler_factory->CreateAuthHandlerFromString(
++  //   //     "Basic realm=\"FooBar\"", HttpAuth::AUTH_SERVER, null_ssl_info,
++  //   //     NetworkAnonymizationKey(), server_scheme_host_port, NetLogWithSource(),
++  //   //     host_resolver.get(), &handler);
++  // }
+ 
+   if (cookie_store_set_by_client_) {
+     context->set_cookie_store(std::move(cookie_store_));
+@@ -384,7 +419,7 @@ std::unique_ptr<URLRequestContext> URLRequestContextBuilder::Build() {
+                                                         context->net_log());
+     context->set_cookie_store(std::move(cookie_store));
+   }
+-
++  // fprintf(stderr, "proxy %s %s\n", proxy_username_.c_str(), proxy_password_.c_str());
+   context->set_transport_security_state(
+       std::make_unique<TransportSecurityState>(hsts_policy_bypass_list_));
+   if (!transport_security_persister_file_path_.empty()) {
+diff --git a/net/url_request/url_request_context_builder.h b/net/url_request/url_request_context_builder.h
+index 66fd979eba..cef09988f5 100644
+--- a/net/url_request/url_request_context_builder.h
++++ b/net/url_request/url_request_context_builder.h
+@@ -191,6 +191,9 @@ class NET_EXPORT URLRequestContextBuilder {
+   // have the headers already set.
+   void set_accept_language(const std::string& accept_language);
+   void set_user_agent(const std::string& user_agent);
++void set_proxy_username(const std::string& proxy_username);
++void set_proxy_password(const std::string& proxy_password);
++void set_proxy_rules(const std::string& proxy_rules);
+ 
+   // Makes the created URLRequestContext use a particular HttpUserAgentSettings
+   // object. Not compatible with set_accept_language() / set_user_agent().
+@@ -404,6 +407,10 @@ class NET_EXPORT URLRequestContextBuilder {
+ 
+   std::string accept_language_;
+   std::string user_agent_;
++  std::string proxy_username_;
++  std::string proxy_password_;
++  std::string proxy_rules_;
++
+   std::unique_ptr<HttpUserAgentSettings> http_user_agent_settings_;
+ 
+   std::optional<std::string> cookie_deprecation_label_;
