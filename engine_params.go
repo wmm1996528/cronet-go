@@ -240,9 +240,11 @@ func (p EngineParams) SetProxyServer(options string) {
 	//p.SetExperimentalOptions(options)
 	fmt.Println(fmt.Sprintf("%s://%s:%s", ui.Scheme, ui.Hostname(), ui.Port()))
 	pwd, _ := ui.User.Password()
-	auth := base64.StdEncoding.EncodeToString([]byte(fmt.Sprintf("%s:%s", ui.User.Username(), pwd)))
-	fmt.Println(auth)
-	p.SetUserAgent("Basic " + auth)
+	if pwd != "" {
+		auth := base64.StdEncoding.EncodeToString([]byte(fmt.Sprintf("%s:%s", ui.User.Username(), pwd)))
+		fmt.Println(auth)
+		p.SetUserAgent("Basic " + auth)
+	}
 	cOptions := C.CString(fmt.Sprintf("%s://%s:%s", ui.Scheme, ui.Hostname(), ui.Port()))
 	C.Cronet_EngineParams_proxy_rules_set(p.ptr, cOptions)
 

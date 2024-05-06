@@ -1,4 +1,4 @@
-module github.com/weblifeio/cronet-go
+module github.com/wmm1996528/cronet-go
 
 go 1.21
 
