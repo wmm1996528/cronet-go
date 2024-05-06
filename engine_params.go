@@ -238,11 +238,11 @@ func (p EngineParams) SetProxyServer(options string) {
 	ui, _ := url.Parse(options)
 	//fmt.Println(options)
 	//p.SetExperimentalOptions(options)
-	fmt.Println(fmt.Sprintf("%s://%s:%s", ui.Scheme, ui.Hostname(), ui.Port()))
+	//fmt.Println(fmt.Sprintf("%s://%s:%s", ui.Scheme, ui.Hostname(), ui.Port()))
 	pwd, _ := ui.User.Password()
 	if pwd != "" {
 		auth := base64.StdEncoding.EncodeToString([]byte(fmt.Sprintf("%s:%s", ui.User.Username(), pwd)))
-		fmt.Println(auth)
+		//fmt.Println(auth)
 		p.SetUserAgent("Basic " + auth)
 	}
 	cOptions := C.CString(fmt.Sprintf("%s://%s:%s", ui.Scheme, ui.Hostname(), ui.Port()))
