@@ -580,3 +580,72 @@ index 66fd979eba..cef09988f5 100644
    std::unique_ptr<HttpUserAgentSettings> http_user_agent_settings_;
  
    std::optional<std::string> cookie_deprecation_label_;
+
+diff --git a/net/http/http_network_session.cc b/net/http/http_network_session.cc
+index fe627f2156..1f4a5e2c1d 100644
+--- a/net/http/http_network_session.cc
++++ b/net/http/http_network_session.cc
+@@ -5,8 +5,9 @@
+ #include "net/http/http_network_session.h"
+
+ #include <inttypes.h>
+-
++#include <cstdlib>
+ #include <utility>
++#include<ctime>
+
+ #include "base/atomic_sequence_num.h"
+ #include "base/check_op.h"
+@@ -37,13 +38,13 @@
+ #include "net/third_party/quiche/src/quiche/quic/core/quic_packets.h"
+ #include "net/third_party/quiche/src/quiche/quic/core/quic_tag.h"
+ #include "net/third_party/quiche/src/quiche/quic/core/quic_utils.h"
+-
+ namespace net {
+
+ // The maximum receive window sizes for HTTP/2 sessions and streams.
+ const int32_t kSpdySessionMaxRecvWindowSize = 15 * 1024 * 1024;  // 15 MB
+ const int32_t kSpdyStreamMaxRecvWindowSize = 6 * 1024 * 1024;    //  6 MB
+
++
+ // Value of SETTINGS_ENABLE_PUSH reflecting that server push is not supported.
+ const uint32_t kSpdyDisablePush = 0;
+
+@@ -75,6 +76,10 @@ spdy::SettingsMap AddDefaultHttp2Settings(spdy::SettingsMap http2_settings) {
+         kSpdyMaxHeaderListSize;
+   }
+
++  // }
++  // fprintf(stderr, "SETTINGS_MAX_HEADER_LIST_SIZE %d\n", kSpdyMaxHeaderListSize);
++  //     DLOG(ERROR) << "SETTINGS_MAX_HEADER_LIST_SIZE " << kSpdyMaxHeaderListSize << " TIMES";
++
+   return http2_settings;
+ }
+
+@@ -185,6 +190,8 @@ HttpNetworkSession::HttpNetworkSession(const HttpNetworkSessionParams& params,
+   CHECK(http_server_properties_);
+   DCHECK(context_.client_socket_factory);
+
++
++
+   normal_socket_pool_manager_ = std::make_unique<ClientSocketPoolManagerImpl>(
+       CreateCommonConnectJobParams(false /* for_websockets */),
+       CreateCommonConnectJobParams(true /* for_websockets */),
+diff --git a/net/url_request/url_request_context_builder.cc b/net/url_request/url_request_context_builder.cc
+index 1649b10001..69304788ab 100644
+--- a/net/url_request/url_request_context_builder.cc
++++ b/net/url_request/url_request_context_builder.cc
+@@ -522,7 +522,13 @@ std::unique_ptr<URLRequestContext> URLRequestContextBuilder::Build() {
+       context.get(), &network_session_context,
+       suppress_setting_socket_performance_watcher_factory_for_testing_,
+       client_socket_factory_raw_);
++  std::default_random_engine random(time(0));
++        std::uniform_int_distribution<int> distribution(32060719, 12060719);
+
++  uint32_t kUndefinedSize = distribution(random);  //  6 MB
++  // uint16_t aaa = 1111;
++  // if (it == http2_settings.end()) {
++  http_network_session_params_.http2_settings.emplace(spdy::SETTINGS_UNDEFINED_SIZE, kUndefinedSize);
+   context->set_http_network_session(std::make_unique<HttpNetworkSession>(
+       http_network_session_params_, network_session_context));
+
