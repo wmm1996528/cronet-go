@@ -1,8 +1,8 @@
 diff --git a/build/install-build-deps.py b/build/install-build-deps.py
-index 9805182573..68aa7b63f4 100755
+index b321fffec0..fb66e9a3ea 100755
 --- a/build/install-build-deps.py
 +++ b/build/install-build-deps.py
-@@ -186,7 +186,7 @@ def check_root():
+@@ -187,7 +187,7 @@ def check_root():
  def apt_update(options):
    if options.lib32 or options.nacl:
      subprocess.check_call(["sudo", "dpkg", "--add-architecture", "i386"])
@@ -11,7 +11,7 @@ index 9805182573..68aa7b63f4 100755
  
  
  # Packages needed for development
-@@ -845,7 +845,7 @@ def install_packages(options):
+@@ -856,7 +856,7 @@ def install_packages(options):
      packages = find_missing_packages(options)
      if packages:
        quiet = ["-qq", "--assume-yes"] if options.no_prompt else []
@@ -20,7 +20,7 @@ index 9805182573..68aa7b63f4 100755
        print(file=sys.stderr)
      else:
        print("No missing packages, and the packages are up to date.",
-@@ -908,18 +908,18 @@ def install_locales():
+@@ -919,18 +919,18 @@ def install_locales():
      old_locale_gen = open(LOCALE_GEN).read()
      for locale in CHROMIUM_LOCALES:
        subprocess.check_call(
@@ -297,7 +297,7 @@ index 0cbbdce569..9f470480eb 100644
    Cronet_Engine_StartWithParams(cronet_engine, engine_params);
    Cronet_EngineParams_Destroy(engine_params);
 diff --git a/components/cronet/url_request_context_config.cc b/components/cronet/url_request_context_config.cc
-index f96c5dadbe..a03ab1f025 100644
+index 5ef2058149..4a4cfbcdb7 100644
 --- a/components/cronet/url_request_context_config.cc
 +++ b/components/cronet/url_request_context_config.cc
 @@ -265,6 +265,9 @@ URLRequestContextConfig::URLRequestContextConfig(
@@ -347,8 +347,8 @@ index f96c5dadbe..a03ab1f025 100644
      context_builder->DisableHttpCache();
    }
    context_builder->set_accept_language(accept_language);
-+    fprintf(stderr, "user_agent %s\n", user_agent.c_str());
-+    fprintf(stderr, "proxy_rules %s\n", proxy_rules.c_str());
++    //fprintf(stderr, "user_agent %s\n", user_agent.c_str());
++    //fprintf(stderr, "proxy_rules %s\n", proxy_rules.c_str());
 +
    context_builder->set_user_agent(user_agent);
 +    context_builder->set_proxy_rules(proxy_rules);
@@ -370,7 +370,7 @@ index f96c5dadbe..a03ab1f025 100644
        enable_network_quality_estimator,
        bypass_public_key_pinning_for_local_trust_anchors,
 diff --git a/components/cronet/url_request_context_config.h b/components/cronet/url_request_context_config.h
-index 8e8e044739..e96c784340 100644
+index 3ce700f953..25f98a3a98 100644
 --- a/components/cronet/url_request_context_config.h
 +++ b/components/cronet/url_request_context_config.h
 @@ -127,6 +127,9 @@ struct URLRequestContextConfig {
@@ -418,14 +418,14 @@ index 8e8e044739..e96c784340 100644
    // experiments and their corresponding configuration options. The format
    // is a JSON object with the name of the experiment as the key, and the
 diff --git a/net/http/http_proxy_client_socket.cc b/net/http/http_proxy_client_socket.cc
-index 02bcb7f817..be123ebabb 100644
+index 7ffbe31b34..f0351271f0 100644
 --- a/net/http/http_proxy_client_socket.cc
 +++ b/net/http/http_proxy_client_socket.cc
 @@ -53,6 +53,7 @@ HttpProxyClientSocket::HttpProxyClientSocket(
    // Synthesize the bits of a request that are actually used.
    request_.url = GURL("https://" + endpoint.ToString());
    request_.method = "CONNECT";
-+  fprintf(stderr, "ua %s\n", user_agent.c_str());
++  //fprintf(stderr, "ua %s\n", user_agent.c_str());
    if (!user_agent.empty())
      request_.extra_headers.SetHeader(HttpRequestHeaders::kUserAgent,
                                       user_agent);
@@ -438,7 +438,7 @@ index 02bcb7f817..be123ebabb 100644
        auth_->AddAuthorizationHeader(&extra_headers);
      // AddAuthorizationHeader() might not have added the header even if
 diff --git a/net/http/proxy_client_socket.cc b/net/http/proxy_client_socket.cc
-index 745ef0e769..704ef99c90 100644
+index 745ef0e769..35da309d8b 100644
 --- a/net/http/proxy_client_socket.cc
 +++ b/net/http/proxy_client_socket.cc
 @@ -16,7 +16,23 @@
@@ -478,7 +478,7 @@ index 745ef0e769..704ef99c90 100644
 +              // request_headers->SetHeader(HttpRequestHeaders::kProxyAuthorization,
 +                            //  "Basic dXNlci11bmkwMDMtcmVnaW9uLWRlLXNlc3NpZC0xMTI1LXNlc3N0aW1lLTUta2VlcC10cnVlOnEzOUNFQlRzNUE1WVFYb3I=");
 +
-+    fprintf(stderr, "ua2 %s\n", user_agent.c_str());
++    //fprintf(stderr, "ua2 %s\n", user_agent.c_str());
 +
    if (!user_agent.empty())
 -    request_headers->SetHeader(HttpRequestHeaders::kUserAgent, user_agent);
@@ -486,8 +486,21 @@ index 745ef0e769..704ef99c90 100644
  
    request_headers->MergeFrom(extra_headers);
  }
+diff --git a/net/url_request/url_request_context.cc b/net/url_request/url_request_context.cc
+index b2fb6821d2..29ad7347a5 100644
+--- a/net/url_request/url_request_context.cc
++++ b/net/url_request/url_request_context.cc
+@@ -153,7 +153,7 @@ void URLRequestContext::AssertNoURLRequests() const {
+     DEBUG_ALIAS_FOR_GURL(url_buf, request->url());
+     base::debug::Alias(&num_requests);
+     base::debug::Alias(&load_flags);
+-    CHECK(false) << "Leaked " << num_requests << " URLRequest(s). First URL: "
++    LOG(ERROR) << "Leaked " << num_requests << " URLRequest(s). First URL: "
+                  << request->url().spec().c_str() << ".";
+   }
+ }
 diff --git a/net/url_request/url_request_context_builder.cc b/net/url_request/url_request_context_builder.cc
-index c4ba732823..b8d99f33fa 100644
+index 238a01adbc..40c6ece046 100644
 --- a/net/url_request/url_request_context_builder.cc
 +++ b/net/url_request/url_request_context_builder.cc
 @@ -51,6 +51,8 @@
@@ -499,7 +512,7 @@ index c4ba732823..b8d99f33fa 100644
  
  #if BUILDFLAG(ENABLE_REPORTING)
  #include "net/network_error_logging/network_error_logging_service.h"
-@@ -122,6 +124,18 @@ void URLRequestContextBuilder::set_user_agent(const std::string& user_agent) {
+@@ -126,6 +128,18 @@ void URLRequestContextBuilder::set_user_agent(const std::string& user_agent) {
    DCHECK(!http_user_agent_settings_);
    user_agent_ = user_agent;
  }
@@ -518,7 +531,7 @@ index c4ba732823..b8d99f33fa 100644
  
  void URLRequestContextBuilder::set_http_user_agent_settings(
      std::unique_ptr<HttpUserAgentSettings> http_user_agent_settings) {
-@@ -376,6 +390,27 @@ std::unique_ptr<URLRequestContext> URLRequestContextBuilder::Build() {
+@@ -387,6 +401,27 @@ std::unique_ptr<URLRequestContext> URLRequestContextBuilder::Build() {
      context->set_http_auth_handler_factory(
          HttpAuthHandlerRegistryFactory::CreateDefault());
    }
@@ -529,8 +542,8 @@ index c4ba732823..b8d99f33fa 100644
 +
 +
 +  //         SSLInfo null_ssl_info;
-+  fprintf(stderr, "proxy_rules_ %s\n", proxy_rules_.c_str());
-+    fprintf(stderr, "user_agent_ %s\n", user_agent_.c_str());
++  //fprintf(stderr, "proxy_rules_ %s\n", proxy_rules_.c_str());
++  //  fprintf(stderr, "user_agent_ %s\n", user_agent_.c_str());
 +
 +  // // url::SchemeHostPort proxy_scheme_host_port(GURL(proxy_rules_.c_str()));
 +
@@ -546,7 +559,7 @@ index c4ba732823..b8d99f33fa 100644
  
    if (cookie_store_set_by_client_) {
      context->set_cookie_store(std::move(cookie_store_));
-@@ -384,7 +419,7 @@ std::unique_ptr<URLRequestContext> URLRequestContextBuilder::Build() {
+@@ -395,7 +430,7 @@ std::unique_ptr<URLRequestContext> URLRequestContextBuilder::Build() {
                                                          context->net_log());
      context->set_cookie_store(std::move(cookie_store));
    }
@@ -556,10 +569,10 @@ index c4ba732823..b8d99f33fa 100644
        std::make_unique<TransportSecurityState>(hsts_policy_bypass_list_));
    if (!transport_security_persister_file_path_.empty()) {
 diff --git a/net/url_request/url_request_context_builder.h b/net/url_request/url_request_context_builder.h
-index 66fd979eba..cef09988f5 100644
+index a15febef3b..dae64c9894 100644
 --- a/net/url_request/url_request_context_builder.h
 +++ b/net/url_request/url_request_context_builder.h
-@@ -191,6 +191,9 @@ class NET_EXPORT URLRequestContextBuilder {
+@@ -195,6 +195,9 @@ class NET_EXPORT URLRequestContextBuilder {
    // have the headers already set.
    void set_accept_language(const std::string& accept_language);
    void set_user_agent(const std::string& user_agent);
@@ -569,7 +582,7 @@ index 66fd979eba..cef09988f5 100644
  
    // Makes the created URLRequestContext use a particular HttpUserAgentSettings
    // object. Not compatible with set_accept_language() / set_user_agent().
-@@ -404,6 +407,10 @@ class NET_EXPORT URLRequestContextBuilder {
+@@ -417,6 +420,10 @@ class NET_EXPORT URLRequestContextBuilder {
  
    std::string accept_language_;
    std::string user_agent_;
