@@ -6,9 +6,6 @@ package cronet
 import "C"
 
 import (
-	"encoding/base64"
-	"fmt"
-	"net/url"
 	"unsafe"
 )
 
@@ -235,18 +232,8 @@ func (p EngineParams) ExperimentalOptions() string {
 // created by this engine. Cronet will forward this requests to destination
 // using this proxy.
 func (p EngineParams) SetProxyServer(options string) {
-	//options = fmt.Sprintf("{\"proxy_server\": \"%s\"}", options)
-	ui, _ := url.Parse(options)
-	//fmt.Println(options)
-	//p.SetExperimentalOptions(options)
-	//fmt.Println(fmt.Sprintf("%s://%s:%s", ui.Scheme, ui.Hostname(), ui.Port()))
-	pwd, _ := ui.User.Password()
-	if pwd != "" {
-		auth := base64.StdEncoding.EncodeToString([]byte(fmt.Sprintf("%s:%s", ui.User.Username(), pwd)))
-		//fmt.Println(auth)
-		p.SetUserAgent("Basic " + auth)
-	}
-	cOptions := C.CString(fmt.Sprintf("%s://%s:%s", ui.Scheme, ui.Hostname(), ui.Port()))
+
+	cOptions := C.CString(options)
 	C.Cronet_EngineParams_proxy_rules_set(p.ptr, cOptions)
 
 	C.free(unsafe.Pointer(cOptions))
