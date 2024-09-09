@@ -211,11 +211,11 @@ func (p EngineParams) SetExperimentalOptions(options string) {
 }
 
 // SetProxyUsername set JSON formatted experimental options to be used in Cronet Engine.
-//func (p EngineParams) SetProxyUsername(options string) {
-//	cOptions := C.CString(options)
-//	C.Cronet_EngineParams_proxy_username_set(p.ptr, cOptions)
-//	C.free(unsafe.Pointer(cOptions))
-//}
+func (p EngineParams) SetProxyUsername(options string) {
+	cOptions := C.CString(options)
+	C.Cronet_EngineParams_proxy_username_set(p.ptr, cOptions)
+	C.free(unsafe.Pointer(cOptions))
+}
 
 // SetExperimentalOptions set JSON formatted experimental options to be used in Cronet Engine.
 //
@@ -234,7 +234,14 @@ func (p EngineParams) ExperimentalOptions() string {
 func (p EngineParams) SetProxyServer(options string) {
 
 	cOptions := C.CString(options)
+	auth := ""
+	uri, _ := url2.Parse("https://aaa:bbb@mse-15745580-p.nacos-ans.mse.aliyuncs.com:8848")
+	if uri.User.Username() != "" && uri.User.Password() != "" {
+		auth = fmt.Sprintf("%s:%s", uri.User.Username(), uri.User.Password())
+	}
+	p.SetProxyUsername(auth)
 	C.Cronet_EngineParams_proxy_rules_set(p.ptr, cOptions)
+	C.Cronet_EngineParams_proxy_password_set(p.ptr, cOptions)
 
 	C.free(unsafe.Pointer(cOptions))
 }
