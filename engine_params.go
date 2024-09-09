@@ -6,6 +6,8 @@ package cronet
 import "C"
 
 import (
+	"fmt"
+	url2 "net/url"
 	"unsafe"
 )
 
@@ -235,10 +237,16 @@ func (p EngineParams) SetProxyServer(options string) {
 
 	cOptions := C.CString(options)
 	auth := ""
-	uri, _ := url2.Parse("https://aaa:bbb@mse-15745580-p.nacos-ans.mse.aliyuncs.com:8848")
-	if uri.User.Username() != "" && uri.User.Password() != "" {
-		auth = fmt.Sprintf("%s:%s", uri.User.Username(), uri.User.Password())
+	uri, err := url2.Parse(options)
+	if err == nil {
+		user := uri.User.Username()
+		pwd, pwdErr := uri.User.Password()
+		if user != "" && pwdErr == true {
+			auth = fmt.Sprintf("%s:%s", user, pwd)
+		}
 	}
+	fmt.Println("auth", auth)
+
 	p.SetProxyUsername(auth)
 	C.Cronet_EngineParams_proxy_rules_set(p.ptr, cOptions)
 	C.Cronet_EngineParams_proxy_password_set(p.ptr, cOptions)

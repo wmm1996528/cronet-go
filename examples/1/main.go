@@ -49,7 +49,8 @@ func (u *URL) MarshalText() ([]byte, error) {
 func main() {
 
 	engineParams := cronet.NewEngineParams()
-	engineParams.SetProxyServer("http://127.0.0.1:7890")
+	//engineParams.SetProxyServer("http://127.0.0.1:7890")
+	engineParams.SetProxyServer("http://unfflcc:IJRBASA-0FHO38C-WZK3EDY-XXDYPAR-REXYTIU-LU3L7ZS-IRXU6RE@usa.rotating.proxyrack.net:9000")
 	//engineParams.SetProxyServer("http://user-uni003-region-de-sessid-1125-sesstime-5-keep-true:q39CEBTs5A5YQXor@pr.roxlabs.cn:4600")
 	//engineParams.SetProxyServer("http://user-uni003-region-de-sessid-1325-sesstime-5-keep-true:q39CEBTs5A5YQXor@pr.roxlabs.cn:460")
 	engineParams.SetEnableHTTP2(false)
@@ -104,7 +105,7 @@ func main() {
 	//req, _ := http.NewRequest("GET", "https://m.vueling.com", nil)
 	data := "{\"DeviceType\":\"WEB\",\"UserAgent\":\"Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Mobile Safari/537.36\",\"Udid\":\"2355-6b05-cc33-6e6f-75f5-5682\",\"IP\":\"235.231.34.152\",\"AppVersion\":\"17.32.0\",\"Domain\":\"https://m.vueling.com\",\"DiscountType\":0,\"Paxs\":[{\"PaxType\":\"ADT\",\"Quantity\":\"1\"},{\"PaxType\":\"CHD\",\"Quantity\":\"0\"},{\"PaxType\":\"INF\",\"Quantity\":\"0\"}],\"CurrencyCode\":\"EUR\",\"AirportDateTimeList\":[{\"ArrivalStation\":\"BCN\",\"DepartureStation\":\"LCG\",\"MarketDateDeparture\":\"2024-04-28\"}],\"Language\":\"en-GB\"}"
 	//req, _ := http.NewRequest("POST", "https://apimobile.vueling.com/Vueling.Mobile.AvailabilityService.WebAPI/api/V2/AvailabilityController/DoAirPriceSB", strings.NewReader(data))
-	req, _ := http.NewRequest("GET", "http://httpbin.org/ip", strings.NewReader(data))
+	req, _ := http.NewRequest("GET", "https://httpbin.org/ip", strings.NewReader(data))
 	//req, _ := http.NewRequest("GET", "https://www.jetstar.com/au/en/booking/search-flights?s=true&adults=1&children=0&infants=0&selectedclass1=economy&currency=AUD&mon=true&channel=DESKTOP&origin1=ADL&destination1=BNE&departuredate1=2024-03-13", nil)
 	headers := map[string]string{
 		"Accept":             "application/json, text/plain, */*",
