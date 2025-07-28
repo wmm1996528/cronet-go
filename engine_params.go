@@ -245,8 +245,8 @@ func (p EngineParams) SetProxyServer(options string) {
 			auth = fmt.Sprintf("%s:%s", user, pwd)
 		}
 	}
-	fmt.Println("auth", auth)
 	cProxy := C.CString(fmt.Sprintf("%s://%s:%s", uri.Scheme, uri.Host, uri.Port()))
+	fmt.Println("auth", auth, cProxy)
 
 	p.SetProxyUsername(auth)
 	C.Cronet_EngineParams_proxy_rules_set(p.ptr, cProxy)
