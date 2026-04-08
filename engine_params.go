@@ -6,8 +6,6 @@ package cronet
 import "C"
 
 import (
-	"fmt"
-	url2 "net/url"
 	"unsafe"
 )
 
@@ -212,13 +210,6 @@ func (p EngineParams) SetExperimentalOptions(options string) {
 	C.free(unsafe.Pointer(cOptions))
 }
 
-// SetProxyUsername set JSON formatted experimental options to be used in Cronet Engine.
-func (p EngineParams) SetProxyUsername(options string) {
-	cOptions := C.CString(options)
-	C.Cronet_EngineParams_proxy_username_set(p.ptr, cOptions)
-	C.free(unsafe.Pointer(cOptions))
-}
-
 // SetExperimentalOptions set JSON formatted experimental options to be used in Cronet Engine.
 //
 //	func (p EngineParams) SetProxyPassword(options string) {
@@ -236,20 +227,20 @@ func (p EngineParams) ExperimentalOptions() string {
 func (p EngineParams) SetProxyServer(options string) {
 
 	cOptions := C.CString(options)
-	auth := ""
-	uri, err := url2.Parse(options)
-	if err == nil {
-		user := uri.User.Username()
-		pwd, pwdErr := uri.User.Password()
-		if user != "" && pwdErr == true {
-			auth = fmt.Sprintf("%s:%s", user, pwd)
-		}
-	}
-	cProxy := C.CString(fmt.Sprintf("%s://%s", uri.Scheme, uri.Host))
-	fmt.Println("auth", auth, fmt.Sprintf("%s://%s", uri.Scheme, uri.Host))
+	//auth := ""
+	//uri, err := url2.Parse(options)
+	//if err == nil {
+	//	user := uri.User.Username()
+	//	pwd, pwdErr := uri.User.Password()
+	//	if user != "" && pwdErr == true {
+	//		auth = fmt.Sprintf("%s:%s", user, pwd)
+	//	}
+	//}
+	//cProxy := C.CString(fmt.Sprintf("%s://%s", uri.Scheme, uri.Host))
+	//fmt.Println("auth", auth, fmt.Sprintf("%s://%s", uri.Scheme, uri.Host))
 
-	p.SetProxyUsername(auth)
-	C.Cronet_EngineParams_proxy_rules_set(p.ptr, cProxy)
+	//p.SetProxyUsername(auth)
+	C.Cronet_EngineParams_proxy_rules_set(p.ptr, cOptions)
 
 	C.free(unsafe.Pointer(cOptions))
 }

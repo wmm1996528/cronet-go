@@ -1,14 +1,17 @@
 package main
 
 import (
-	"github.com/wmm1996528/cronet-go"
+	"fmt"
 	"io"
 	"log"
+	"math/rand"
 	"net/http"
 	"net/http/cookiejar"
 	"net/url"
 	"os"
 	"strings"
+
+	"github.com/wmm1996528/cronet-go"
 )
 
 // URL wraps the net/url.URL type to enable unmarshalling from text
@@ -49,11 +52,12 @@ func (u *URL) MarshalText() ([]byte, error) {
 func main() {
 
 	engineParams := cronet.NewEngineParams()
-	//engineParams.SetProxyServer("http://127.0.0.1:7890")
-	engineParams.SetProxyServer("http://unfflcc:IJRBASA-0FHO38C-WZK3EDY-XXDYPAR-REXYTIU-LU3L7ZS-IRXU6RE@usa.rotating.proxyrack.net:9000")
+	engineParams.SetProxyServer("http://127.0.0.1:8882")
+	engineParams.SetProxyServer("http://test13084,sid-WvWYcxmJov,iso-jp:64b2e01edc2@10.188.200.27:21608")
+	//engineParams.SetProxyServer("http://unfflcc:IJRBASA-0FHO38C-WZK3EDY-XXDYPAR-REXYTIU-LU3L7ZS-IRXU6RE@usa.rotating.proxyrack.net:9000")
 	//engineParams.SetProxyServer("http://user-uni003-region-de-sessid-1125-sesstime-5-keep-true:q39CEBTs5A5YQXor@pr.roxlabs.cn:4600")
 	//engineParams.SetProxyServer("http://user-uni003-region-de-sessid-1325-sesstime-5-keep-true:q39CEBTs5A5YQXor@pr.roxlabs.cn:460")
-	engineParams.SetEnableHTTP2(false)
+	engineParams.SetEnableHTTP2(true)
 	engineParams.SetEnableQuic(false)
 	engineParams.SetEnableBrotli(true)
 	engineParams.SetEnablePublicKeyPinningBypassForLocalTrustAnchors(true)
@@ -103,27 +107,32 @@ func main() {
 	}
 	//data := "{\"isFlightChange\":false,\"flightList\":[{\"departureStation\":\"BOJ\",\"arrivalStation\":\"VIE\",\"departureDate\":\"2024-07-21\"}],\"adultCount\":1,\"childCount\":0,\"infantCount\":0,\"wdc\":true}"
 	//req, _ := http.NewRequest("GET", "https://m.vueling.com", nil)
-	data := "{\"DeviceType\":\"WEB\",\"UserAgent\":\"Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Mobile Safari/537.36\",\"Udid\":\"2355-6b05-cc33-6e6f-75f5-5682\",\"IP\":\"235.231.34.152\",\"AppVersion\":\"17.32.0\",\"Domain\":\"https://m.vueling.com\",\"DiscountType\":0,\"Paxs\":[{\"PaxType\":\"ADT\",\"Quantity\":\"1\"},{\"PaxType\":\"CHD\",\"Quantity\":\"0\"},{\"PaxType\":\"INF\",\"Quantity\":\"0\"}],\"CurrencyCode\":\"EUR\",\"AirportDateTimeList\":[{\"ArrivalStation\":\"BCN\",\"DepartureStation\":\"LCG\",\"MarketDateDeparture\":\"2024-04-28\"}],\"Language\":\"en-GB\"}"
 	//req, _ := http.NewRequest("POST", "https://apimobile.vueling.com/Vueling.Mobile.AvailabilityService.WebAPI/api/V2/AvailabilityController/DoAirPriceSB", strings.NewReader(data))
-	req, _ := http.NewRequest("GET", "https://httpbin.org/ip", strings.NewReader(data))
 	//req, _ := http.NewRequest("GET", "https://www.jetstar.com/au/en/booking/search-flights?s=true&adults=1&children=0&infants=0&selectedclass1=economy&currency=AUD&mon=true&channel=DESKTOP&origin1=ADL&destination1=BNE&departuredate1=2024-03-13", nil)
+	targetURL := "https://www.res.skymark.co.jp/reserve2/inputDateAirline"
+	uaaa := "Mozilla/5.0 (Macintosh; Intel Mac OS X 11_6) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.2 Safari/605.1.15"
+
+	// 10から25までのランダムな日を生成
+	day := rand.Intn(16) + 10 // 0〜15の乱数 + 10
+	dataStr := fmt.Sprintf("request=top&country2=jp&language=ja&seat=1&fromTop=on&year=2026&month=4&day=%d&departure=HND&arrival=CTS", day)
+	req, _ := http.NewRequest("POST", targetURL, strings.NewReader(dataStr))
+
+	// ヘッダーのマップを作成
 	headers := map[string]string{
-		"Accept":             "application/json, text/plain, */*",
-		"Accept-Language":    "en",
-		"Cache-Control":      "no-cache",
-		"Connection":         "keep-alive",
-		"Content-Type":       "application/json",
-		"Origin":             "https://m.vueling.com",
-		"Pragma":             "no-cache",
-		"Referer":            "https://m.vueling.com/",
-		"Sec-Fetch-Dest":     "empty",
-		"Sec-Fetch-Mode":     "cors",
-		"Sec-Fetch-Site":     "same-site",
-		"User-Agent":         "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Mobile Safari/537.36",
-		"sec-ch-ua":          "\"Google Chrome\";v=\"123\", \"Not:A-Brand\";v=\"8\", \"Chromium\";v=\"123\"",
-		"sec-ch-ua-mobile":   "?1",
-		"sec-ch-ua-platform": "\"Android\"",
-		"Cookie":             "AKA_A2=A; _abck=7DC49CCB10C0F987AD5287FB8B6CCF97~-1~YAAQhpcwFwX40iWPAQAA0yWjTAuZYNpy+C5yf44Om2GvG15ifV8QnEXrvOE3hHYOHYU1wbuaXE07/80BH2QrVhscipeLawb4VBWjlKOY7u9pi+gZzBp1q25ZjgvGPD3WKFT73y/EOOJ3/Run/X+jNvLi7bSC/fHWIGItP90nmyg8vEsa33V3BSYc21kY2cXiHMs8oAJ6y4w8Ob3szmJfAI7uluVmPb1xdPxSIZwRzsyT8Ztph1UtxABkABR/Vm8nq3Rrza5mGdzb3f/rOMJz3rd/B5Be+b0RZc7JBbv2OiTJRCCo6wq0BKnWK3uIgO09w/98XlgNVJJvLAvZIM4vj/7pdvZsVWj+6lTTEjN6wTNeIv0n8bXFIbGnGf9pY8J4rilj1ZnByS1uv9FZi8uf64VA5YF0oyCB~0~-1~-1; ak_bmsc=BAFA803394F9A21027995AB4EF2811DC~000000000000000000000000000000~YAAQhpcwFwb40iWPAQAA0yWjTBcHdU1xniHmmVnT/R/aIty9ne4GjAaUbFJlW2XbYcjjBWRsxC4H+iL7tN+dSumqg3EDapbhw/xzNfn+DJdPEXjbjk+MCq8m0xwDZ2S3Xb4Do9rgbfimD1ylmeH3WuFP3bxdYWowTusDR7yzxMdUrbspXbqYZZ7UR+HinSSZi0JJNomu54NxW5NnOpm/5VCVtpNpFjyb+4ZIHzlI4hzdjbfs39ZPxtYPHcuhfA3PiX+YZJYZVb03Mp+Gi/kvA719/ektFTnwi8NxO2OYD+2xlqwLclhjTiplwUV/BuOg6/i29n0ZhncOBAr3MC/IgZFOGdQoi/SWARYqcGWOXXwkGrBk58hTL2423a6Iu0qsL+Ue6ECX5lRi2GI+W4Gb6A==; bm_s=YAAQdcMTAqD4hOqOAQAAnB2jTAG+TI/CzgSv3helQ8m8Ulw8pQ6NlMpRMBb/t6XeGEbqzZdfnFutDbzy3NM8jqfRwandpY7HjoJXDjjAd06ivvGnfAEEpOtc5GUdwRE6dj4JP0SwHksk3YScrI0+1E6YHLEMXjdu61z+h1p72p/eYwAozkNRN801/n7oIACSFWQvgBO2vwQLoNTs+P9EpTtN6YCC7FsIZUni8a2tpp5SHyyyX9rHh6bplMzz7+ediB21vYssO9DlxJ21MnqZs7Vo+Oa8E4p/AfahxDEi7WlcVo7eW3+Gy4x9Zf9CnL52CBiJ7YaSh2xPClHRNt7ICW98rVSGFF4PVHeE9V0W2rA=; bm_ss=ab8e18ef4e; bm_sv=0CE92A4C0475517D455E6305FFB7E4C9~YAAQhpcwFwf40iWPAQAA0yWjTBdsoW2C4DbMEEDfHOy7yf9I+4qkVGF9U9nCjDRoZO4JZ649fjuGUyPMtZa2TPTLakFAbtRl/jIqMhWZ3sfPQ0jpuSiyHWzQVH7zd3MTMokhDuqhbs5R3kW4N4TqTj8tlDApc2qajIJJN4nerJqIUP30hiu8E73Fs2/B3SGZMeGaklhTXSXhnr1DbmKkP0CHSS9gOMwG8RxeB/xRkFk5Bi2NLj4dDv9cGDtQyxrufw==~1; bm_sz=7E5F623E20D591A20973DD624C5463BB~YAAQdcMTArn4hOqOAQAALh+jTBd5Y2O2OSTGoidyBknWzVWZDkX6IABE8Qh2YXe3urJdm1kbTVaRMbViQ9hAeawbfVzswXFpNErY7wJ/pAOo2QZYse616xX4xiyLofPwbSSTDuWhHVTb+ot5oZ2fidbtnl4FFZjTzRqQf0eieGwFcMG3y3ugsrYNhdjtjxYD2h3TGoaHsi9ii3F+9GW6r4hSYRqtVAafBtn8W0HF4aelO2oksl2uFEKt1vT3xTTc/4CeLFBdQr78qPv3vGUuBqhuIWadWjupPBDTTaxNZub0vkwaVBpX0d+FMEqIc+Hnn6bcHrvm6BmZxhwsPRa98fES2qKf6BAjX+3oerXMgYBliHWZce+qlFe7kxjTV9k15QkAwe745TJr4rUnoKNBXXeJtQ==~3683907~3224641; sec_cpt=4FE66FEE3C575CD1D1822E6A0B5BE420~3~YAAQhpcwFxz80iWPAQAAraGjTAto2fbPfFqEeXsbHGVA0sAjh6xQuYpEcFE2OV7gY6+mOPxa7n4arEwR43ukhEQOB7YL5nHJNf3VEdaEEVK5wnJrclx7+kvursMGKL/m/9uQ9y+fVpHEI3rpSG/DolZA18h58LhzZoJEBZqLVfu6X5s++c/5YR+shKlPsk/+sLsToGEaUbvNxduLRrLZwiP3FyxNqady5zm6AyP2k9MUssi6Ilt3Ln+4rJMKkRCo86dKF5sm2yG2ZGT+5ETksbIBAXaavZFkqUgnmLnWwy6m+PL2gC0aQWu7xNP0v0Oiay8k8ou+3lJXRLnizvx1qyLrJDBK8cdHzV+ntybvQcwyDDg7u8DAx8UHAs3Ubjm3l7wrlM4yxFYIa4ku2hcyu0Y9pXPcQ2/GDCa+eGSnw/N6hgtoXOeWPuyzmM+uL4g0z3VH02X+OISMtBufrK48O4uPnzKroq4Uko19sRciksirwwltnMEq9Fi/sSLOKDrtdHkUa1ODYxCwr3kQSF+vpfen5ZeK1EK0oMMzHwNrzka//X+2flTQu8Sztvlt9nbDvlY5xcuvJ0CfBtyH0bTDj/SDEZTLhh0XO5GwhU9AF8aLehVi2WfdfPwAsnqvRIbZ1KY11Y4ZNvgm2aWo13nn2X9nWKEPe+qyAb9xGzwFwdoCj9FI02cGUuM2Nk6960rMF/x/aOKMx8skTl3ujtRQuNxnBV7nl9we8ET2u4thi5FQ3UHm/HKUKWMZU0Q7GKw7BEbigQHfeW5gFvuuP4oj5WGV4lHm/7JqcevYr4/idsGfat1v0USoxVZo6bFi3ixYFsd+ruw0q62Fx6GGnA==",
+		"Accept":                    "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+		"Accept-Language":           "ja",
+		"Cache-Control":             "max-age=0",
+		"Connection":                "keep-alive",
+		"Referer":                   "https://www.res.skymark.co.jp/reserve2/inputDateAirline",
+		"Sec-Fetch-Dest":            "document",
+		"Sec-Fetch-Mode":            "navigate",
+		"Sec-Fetch-Site":            "same-origin",
+		"Upgrade-Insecure-Requests": "1",
+		"Content-Type":              "application/x-www-form-urlencoded",
+		"User-Agent":                uaaa,
+		"sec-ch-ua":                 `"Chromium";v="146", "Not-A.Brand";v="24", "Google Chrome";v="146"`,
+		"sec-ch-ua-mobile":          "?0",
+		"sec-ch-ua-platform":        `"macOS"`,
 	}
 	for k, v := range headers {
 		req.Header.Set(k, v)
