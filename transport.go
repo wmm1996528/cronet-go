@@ -75,6 +75,8 @@ func (t *RoundTripper) Close() error {
 
 func (t *RoundTripper) RoundTrip(request *http.Request) (*http.Response, error) {
 	requestParams := NewURLRequestParams()
+
+	requestParams.SetPriority(URLRequestParamsRequestPriorityHighest)
 	if request.Method == "" {
 		requestParams.SetMethod("GET")
 	} else {
